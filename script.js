@@ -84,6 +84,7 @@ function initApp() {
   initCountdown();
   renderQuickStats();
   renderTeamLeaderboard();
+  renderTeamRosters();
   renderPlayerLeaderboard();
   renderBonusChallenges();
   renderFinalScore();
@@ -365,6 +366,35 @@ function renderTeamLeaderboard() {
     color: t.color,
     suffix: ' km'
   })));
+}
+
+function renderTeamRosters() {
+  const container = document.getElementById('teamRosters');
+  if (!container) return;
+
+  const rosterCards = data.teams.map(team => {
+    const teamPlayers = data.players
+      .filter(p => p.team === team.id)
+      .sort((a, b) => a.name.localeCompare(b.name, 'de'));
+
+    const playerList = teamPlayers.length > 0
+      ? teamPlayers.map(player => `<li class="team-roster-player">${player.name}</li>`).join('')
+      : '<li class="team-roster-player text-muted">Keine Spieler</li>';
+
+    return `
+      <article class="team-roster-card" style="border-top-color:${team.color}">
+        <div class="team-roster-header">
+          <span class="team-roster-title">${team.emoji} ${team.name}</span>
+          <span class="team-roster-count">${teamPlayers.length}</span>
+        </div>
+        <ul class="team-roster-list">
+          ${playerList}
+        </ul>
+      </article>
+    `;
+  });
+
+  container.innerHTML = rosterCards.join('');
 }
 
 // ─────────────────────────────────────────────

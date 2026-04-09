@@ -393,6 +393,64 @@ a:hover { text-decoration: underline; }
   color: var(--text-muted);
 }
 
+/* Team rosters */
+.team-rosters {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.team-roster-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: 4px solid;
+  border-radius: var(--radius);
+  padding: 14px;
+}
+
+.team-roster-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  gap: 8px;
+}
+
+.team-roster-title {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.team-roster-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: var(--surface2);
+  color: var(--text-muted);
+  font-size: .78rem;
+  font-weight: 700;
+  padding: 0 8px;
+}
+
+.team-roster-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.team-roster-player {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  font-size: .86rem;
+}
+
 /* ── TABLES ──────────────────────────────────────────────────── */
 .table-container {
   overflow-x: auto;
@@ -736,6 +794,10 @@ a:hover { text-decoration: underline; }
   }
 
   .team-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .team-rosters {
     grid-template-columns: 1fr;
   }
 
