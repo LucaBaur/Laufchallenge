@@ -512,6 +512,14 @@ a:hover { text-decoration: underline; }
   white-space: nowrap;
 }
 
+.bonus-description {
+  padding: 10px 18px 0 18px;
+  font-size: .85rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin: 0;
+}
+
 .bonus-card-body {
   padding: 14px 18px;
 }

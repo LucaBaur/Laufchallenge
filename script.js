@@ -449,7 +449,6 @@ function renderPlayerTable(players) {
 const BONUS_STD     = [20, 10, 5];
 const BONUS_ROTATIE = [30, 15, 10];
 const BONUS_DOUBLE  = [25, 15, 10];
-const BONUS_IRON    = [25, 15, 10];
 
 function renderBonusChallenges() {
   const grid = document.getElementById('bonusGrid');
@@ -457,14 +456,10 @@ function renderBonusChallenges() {
     buildBonusLongestDist(),
     buildBonusLongestTime(),
     buildBonusTotalElev(),
-    buildBonusHillHero(),
     buildBonusBestDuo(),
     buildBonusTeamRotation(),
     buildBonusDoubleAgent(),
-    buildBonusIronMan(),
-    buildBonusIronWoman(),
     buildBonusLongestStreak(),
-    buildBonusConsistencyKing(),
     buildBonusEarlyBird(),
     buildBonusNightRunner()
   ];
@@ -472,7 +467,7 @@ function renderBonusChallenges() {
 }
 
 /** Build a bonus card HTML string */
-function makeBonusCard(title, icon, pointsLabel, rows) {
+function makeBonusCard(title, icon, pointsLabel, rows, description = '') {
   const rowsHtml = rows.slice(0, 3).map((r, i) => {
     const rankCls = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : 'rank-3';
     const pts = r.pts !== undefined ? `+${r.pts} Pkt` : '';
@@ -495,6 +490,8 @@ function makeBonusCard(title, icon, pointsLabel, rows) {
     </div>
   `).join('');
 
+  const descHtml = description ? `<p class="bonus-description">${description}</p>` : '';
+
   return `
     <div class="bonus-card">
       <div class="bonus-card-header">
@@ -502,6 +499,7 @@ function makeBonusCard(title, icon, pointsLabel, rows) {
         <span class="bonus-card-title">${title}</span>
         <span class="bonus-card-points">${pointsLabel}</span>
       </div>
+      ${descHtml}
       <div class="bonus-card-body">
         ${rowsHtml}${empty}
       </div>
@@ -524,7 +522,8 @@ function buildBonusLongestDist() {
   });
   const ranked = Object.entries(best).sort((a, b) => b[1] - a[1]).slice(0, 3);
   return makeBonusCard('Längster Lauf (Distanz)', '📏', '1→20 | 2→10 | 3→5',
-    ranked.map(([pid, v], i) => ({ name: playerDisplay(pid), value: v.toFixed(1) + ' km', pts: BONUS_STD[i] }))
+    ranked.map(([pid, v], i) => ({ name: playerDisplay(pid), value: v.toFixed(1) + ' km', pts: BONUS_STD[i] })),
+    'Der längste einzelne Lauf in Kilometern pro Spieler.'
   );
 }
 
@@ -536,7 +535,8 @@ function buildBonusLongestTime() {
   });
   const ranked = Object.entries(best).sort((a, b) => b[1] - a[1]).slice(0, 3);
   return makeBonusCard('Längster Lauf (Zeit)', '⏱', '1→20 | 2→10 | 3→5',
-    ranked.map(([pid, v], i) => ({ name: playerDisplay(pid), value: v + ' min', pts: BONUS_STD[i] }))
+    ranked.map(([pid, v], i) => ({ name: playerDisplay(pid), value: v + ' min', pts: BONUS_STD[i] })),
+    'Der längste einzelne Lauf in Minuten pro Spieler.'
   );
 }
 
@@ -547,31 +547,8 @@ function buildBonusTotalElev() {
   data.runs.forEach(r => { if (totals[r.player] !== undefined) totals[r.player] += r.elevation; });
   const ranked = Object.entries(totals).sort((a, b) => b[1] - a[1]).slice(0, 3);
   return makeBonusCard('Meiste Höhenmeter', '⛰️', '1→20 | 2→10 | 3→5',
-    ranked.map(([pid, v], i) => ({ name: playerDisplay(pid), value: v.toLocaleString('de-DE') + ' m', pts: BONUS_STD[i] }))
-  );
-}
-
-// Hill Hero – most elevation in ONE week
-function buildBonusHillHero() {
-  // For each player, compute elevation per week, then take their best week
-  const weekElev = {}; // { pid: { weekKey: elevation } }
-  data.players.forEach(p => { weekElev[p.id] = {}; });
-
-  data.runs.forEach(r => {
-    if (!weekElev[r.player]) return;
-    const wk = weekKey(r.date);
-    weekElev[r.player][wk] = (weekElev[r.player][wk] || 0) + r.elevation;
-  });
-
-  const best = {};
-  Object.entries(weekElev).forEach(([pid, weeks]) => {
-    const vals = Object.values(weeks);
-    best[pid] = vals.length > 0 ? Math.max(...vals) : 0;
-  });
-
-  const ranked = Object.entries(best).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]).slice(0, 3);
-  return makeBonusCard('Hill Hero (Woche)', '🏔️', '1→20 | 2→10 | 3→5',
-    ranked.map(([pid, v], i) => ({ name: playerDisplay(pid), value: v.toLocaleString('de-DE') + ' m / Woche', pts: BONUS_STD[i] }))
+    ranked.map(([pid, v], i) => ({ name: playerDisplay(pid), value: v.toLocaleString('de-DE') + ' m', pts: BONUS_STD[i] })),
+    'Spieler mit den meisten Höhenmetern über alle Läufe hinweg.'
   );
 }
 
@@ -608,7 +585,8 @@ function buildBonusBestDuo() {
       sub: `mit ${getPlayer(partnerId).name}`,
       value: count + ' gemeinsame Läufe',
       pts: BONUS_STD[i]
-    }))
+    })),
+    'Spieler mit den meisten gemeinsamen Läufen mit demselben Partner.'
   );
 }
 
@@ -629,7 +607,8 @@ function buildBonusTeamRotation() {
     .slice(0, 3);
 
   return makeBonusCard('Team Rotation', '🔄', '1→30 | 2→15 | 3→10',
-    ranked.map(([pid, v], i) => ({ name: playerDisplay(pid), value: v + ' verschiedene Partner', pts: BONUS_ROTATIE[i] }))
+    ranked.map(([pid, v], i) => ({ name: playerDisplay(pid), value: v + ' verschiedene Partner', pts: BONUS_ROTATIE[i] })),
+    'Spieler mit den meisten verschiedenen Laufpartnern – für Flexibilität im Team.'
   );
 }
 
@@ -650,45 +629,8 @@ function buildBonusDoubleAgent() {
     .slice(0, 3);
 
   return makeBonusCard('Double Agent', '🕵️', '1→25 | 2→15 | 3→10',
-    ranked.map(([pid, v], i) => ({ name: playerDisplay(pid), value: v + ' teamfremde Läufe', pts: BONUS_DOUBLE[i] }))
-  );
-}
-
-// Iron Man – male players, most weeks with 3+ runs
-function buildBonusIronMan() {
-  return buildBonusIron('m', 'Iron Man', '💪');
-}
-
-// Iron Woman – female players, most weeks with 3+ runs
-function buildBonusIronWoman() {
-  return buildBonusIron('f', 'Iron Woman', '💪');
-}
-
-function buildBonusIron(gender, title, icon) {
-  // Group runs by player → by week
-  const weekRuns = {}; // { pid: { weekKey: count } }
-  data.players
-    .filter(p => p.gender === gender)
-    .forEach(p => { weekRuns[p.id] = {}; });
-
-  data.runs.forEach(r => {
-    if (!weekRuns[r.player]) return;
-    const wk = weekKey(r.date);
-    weekRuns[r.player][wk] = (weekRuns[r.player][wk] || 0) + 1;
-  });
-
-  const qualified = {}; // { pid: weeks_with_3plus }
-  Object.entries(weekRuns).forEach(([pid, weeks]) => {
-    qualified[pid] = Object.values(weeks).filter(cnt => cnt >= 3).length;
-  });
-
-  const ranked = Object.entries(qualified)
-    .filter(([, v]) => v > 0)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 3);
-
-  return makeBonusCard(title, icon, '1→25 | 2→15 | 3→10',
-    ranked.map(([pid, v], i) => ({ name: playerDisplay(pid), value: v + ' Wochen mit 3+ Läufen', pts: BONUS_IRON[i] }))
+    ranked.map(([pid, v], i) => ({ name: playerDisplay(pid), value: v + ' teamfremde Läufe', pts: BONUS_DOUBLE[i] })),
+    'Spieler mit den meisten Läufen mit Partnern aus anderen Teams – für Teamgeist.'
   );
 }
 
@@ -728,33 +670,8 @@ function buildBonusLongestStreak() {
     .slice(0, 3);
 
   return makeBonusCard('Längste Serie', '🔥', '1→20 | 2→10 | 3→5',
-    ranked.map(([pid, v], i) => ({ name: playerDisplay(pid), value: v + ' Tage in Folge', pts: BONUS_STD[i] }))
-  );
-}
-
-// Consistency King – most weeks with at least 2 runs
-function buildBonusConsistencyKing() {
-  const weekRuns = {};
-  data.players.forEach(p => { weekRuns[p.id] = {}; });
-
-  data.runs.forEach(r => {
-    if (!weekRuns[r.player]) return;
-    const wk = weekKey(r.date);
-    weekRuns[r.player][wk] = (weekRuns[r.player][wk] || 0) + 1;
-  });
-
-  const qualified = {};
-  Object.entries(weekRuns).forEach(([pid, weeks]) => {
-    qualified[pid] = Object.values(weeks).filter(cnt => cnt >= 2).length;
-  });
-
-  const ranked = Object.entries(qualified)
-    .filter(([, v]) => v > 0)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 3);
-
-  return makeBonusCard('Consistency King', '👑', '1→20 | 2→10 | 3→5',
-    ranked.map(([pid, v], i) => ({ name: playerDisplay(pid), value: v + ' Wochen mit 2+ Läufen', pts: BONUS_STD[i] }))
+    ranked.map(([pid, v], i) => ({ name: playerDisplay(pid), value: v + ' Tage in Folge', pts: BONUS_STD[i] })),
+    'Spieler mit den meisten hintereinander folgenden Lauftagen – für Konsistenz.'
   );
 }
 
@@ -766,7 +683,8 @@ function buildBonusEarlyBird() {
     .sort((a, b) => b[1] - a[1])
     .slice(0, 3);
   return makeBonusCard('Early Bird', '🌅', '1→20 | 2→10 | 3→5',
-    ranked.map(([pid, v], i) => ({ name: playerDisplay(pid), value: `${v} Läufe vor ${pad2(EARLY_BIRD_HOUR)}:00`, pts: BONUS_STD[i] }))
+    ranked.map(([pid, v], i) => ({ name: playerDisplay(pid), value: `${v} Läufe vor ${pad2(EARLY_BIRD_HOUR)}:00`, pts: BONUS_STD[i] })),
+    `Spieler mit den meisten Läufen vor ${pad2(EARLY_BIRD_HOUR)}:00 Uhr – für die Frühaufsteher.`
   );
 }
 
@@ -778,7 +696,8 @@ function buildBonusNightRunner() {
     .sort((a, b) => b[1] - a[1])
     .slice(0, 3);
   return makeBonusCard('Night Runner', '🌙', '1→20 | 2→10 | 3→5',
-    ranked.map(([pid, v], i) => ({ name: playerDisplay(pid), value: `${v} Läufe nach ${pad2(NIGHT_RUNNER_HOUR)}:00`, pts: BONUS_STD[i] }))
+    ranked.map(([pid, v], i) => ({ name: playerDisplay(pid), value: `${v} Läufe nach ${pad2(NIGHT_RUNNER_HOUR)}:00`, pts: BONUS_STD[i] })),
+    `Spieler mit den meisten Läufen nach ${pad2(NIGHT_RUNNER_HOUR)}:00 Uhr – für die Nachtscheulen.`
   );
 }
 
@@ -830,21 +749,6 @@ function computeBonusPointsPerTeam() {
   data.runs.forEach(r => { if (totElev[r.player] !== undefined) totElev[r.player] += r.elevation; });
   addBonusPoints(Object.entries(totElev).sort((a, b) => b[1] - a[1]), BONUS_STD);
 
-  // ── Hill hero
-  const weekElev = {};
-  data.players.forEach(p => { weekElev[p.id] = {}; });
-  data.runs.forEach(r => {
-    if (!weekElev[r.player]) return;
-    const wk = weekKey(r.date);
-    weekElev[r.player][wk] = (weekElev[r.player][wk] || 0) + r.elevation;
-  });
-  const bestWeekElev = {};
-  Object.entries(weekElev).forEach(([pid, weeks]) => {
-    const vals = Object.values(weeks);
-    bestWeekElev[pid] = vals.length > 0 ? Math.max(...vals) : 0;
-  });
-  addBonusPoints(Object.entries(bestWeekElev).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]), BONUS_STD);
-
   // ── Best duo
   const pairCounts = {};
   data.players.forEach(p => { pairCounts[p.id] = {}; });
@@ -880,22 +784,6 @@ function computeBonusPointsPerTeam() {
   });
   addBonusPoints(Object.entries(crossRuns).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]), BONUS_DOUBLE);
 
-  // ── Iron Man
-  (['m', 'f']).forEach((gender, gi) => {
-    const weekRuns = {};
-    data.players.filter(p => p.gender === gender).forEach(p => { weekRuns[p.id] = {}; });
-    data.runs.forEach(r => {
-      if (!weekRuns[r.player]) return;
-      const wk = weekKey(r.date);
-      weekRuns[r.player][wk] = (weekRuns[r.player][wk] || 0) + 1;
-    });
-    const qualified = {};
-    Object.entries(weekRuns).forEach(([pid, weeks]) => {
-      qualified[pid] = Object.values(weeks).filter(cnt => cnt >= 3).length;
-    });
-    addBonusPoints(Object.entries(qualified).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]), BONUS_IRON);
-  });
-
   // ── Longest streak
   const datesByPlayer = {};
   data.players.forEach(p => { datesByPlayer[p.id] = new Set(); });
@@ -912,20 +800,6 @@ function computeBonusPointsPerTeam() {
     streaks[pid] = max;
   });
   addBonusPoints(Object.entries(streaks).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]), BONUS_STD);
-
-  // ── Consistency king
-  const weekRunsCK = {};
-  data.players.forEach(p => { weekRunsCK[p.id] = {}; });
-  data.runs.forEach(r => {
-    if (!weekRunsCK[r.player]) return;
-    const wk = weekKey(r.date);
-    weekRunsCK[r.player][wk] = (weekRunsCK[r.player][wk] || 0) + 1;
-  });
-  const qualCK = {};
-  Object.entries(weekRunsCK).forEach(([pid, weeks]) => {
-    qualCK[pid] = Object.values(weeks).filter(cnt => cnt >= 2).length;
-  });
-  addBonusPoints(Object.entries(qualCK).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]), BONUS_STD);
 
   // ── Early bird
   addBonusPoints(
