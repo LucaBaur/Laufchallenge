@@ -53,6 +53,12 @@ a:hover { text-decoration: underline; }
   padding: 0 16px;
 }
 
+@media (max-width: 600px) {
+  .container {
+    padding: 0 12px;
+  }
+}
+
 /* ── HEADER ──────────────────────────────────────────────────── */
 .site-header {
   background: var(--surface);
@@ -306,6 +312,18 @@ a:hover { text-decoration: underline; }
   gap: 14px;
 }
 
+@media (max-width: 600px) {
+  .quick-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 400px) {
+  .quick-stats {
+    grid-template-columns: 1fr;
+  }
+}
+
 .quick-stat-card {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -334,6 +352,18 @@ a:hover { text-decoration: underline; }
   grid-template-columns: repeat(3, 1fr);
   gap: 16px;
   margin-bottom: 28px;
+}
+
+@media (max-width: 750px) {
+  .team-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .team-cards {
+    grid-template-columns: 1fr;
+  }
 }
 
 .team-card {
@@ -536,6 +566,18 @@ a:hover { text-decoration: underline; }
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
   gap: 18px;
+}
+
+@media (max-width: 750px) {
+  .bonus-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .bonus-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .bonus-card {
@@ -808,36 +850,221 @@ a:hover { text-decoration: underline; }
 
 /* Mobile */
 @media (max-width: 600px) {
-  .header-content { gap: 10px; }
+  body { font-size: 14px; }
 
-  .main-nav { display: none; width: 100%; }
-  .main-nav.open { display: flex; flex-direction: column; }
+  /* Header */
+  .header-content { gap: 8px; padding: 10px 0; flex-wrap: nowrap; }
 
-  .hamburger { display: block; margin-left: auto; }
+  .main-nav { 
+    display: none; 
+    width: 100%; 
+    position: absolute; 
+    top: 100%; 
+    left: 0; 
+    right: 0; 
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 8px;
+    flex-direction: column;
+    gap: 4px;
+    z-index: 99;
+  }
+  .main-nav.open { display: flex; }
 
-  .header-title h1 { font-size: 1rem; }
+  .hamburger { display: block; margin-left: auto; padding: 6px 10px; font-size: 1.2rem; }
+
+  .header-title h1 { font-size: 0.95rem; font-weight: 700; }
+  .header-title { min-width: auto; }
+  .header-icon { font-size: 1.5rem; }
+  .header-sub { font-size: 0.7rem; }
+
+  /* Navigation buttons smaller on mobile */
+  .nav-btn { padding: 5px 10px; font-size: 0.78rem; }
+
+  /* Sections */
+  .section { padding: 20px 0 32px; }
+  .section-header { margin-bottom: 16px; }
+  .section-header h2 { font-size: 1.2rem; }
+  .section-sub { font-size: 0.8rem; }
+
+  /* Countdown */
+  .countdown-card { padding: 18px 12px; }
 
   .countdown-info-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .info-card { padding: 12px; gap: 10px; }
+  .info-icon { font-size: 1.4rem; }
+  .info-value { font-size: 1.1rem; }
+  .info-label { font-size: 0.7rem; }
+
+  .clock-value { font-size: 1.6rem; }
+  .clock-sep { font-size: 1.4rem; margin-bottom: 8px; }
+  .clock-unit { min-width: 50px; }
+  .clock-label { font-size: 0.6rem; }
+
+  .progress-section { padding: 14px 12px; }
+  .progress-header { font-size: 0.8rem; }
+  .progress-bar-bg { height: 16px; }
+
+  /* Quick stats */
+  .quick-stats {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+  }
+
+  .quick-stat-card { padding: 12px; }
+  .quick-stat-value { font-size: 1.3rem; }
+  .quick-stat-label { font-size: 0.65rem; }
+
+  /* Team cards */
+  .team-cards {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .team-card { padding: 14px; }
+  .team-card-name { font-size: 1rem; margin-bottom: 10px; }
+  .team-card-stats { gap: 6px; }
+  .team-stat { padding: 6px 8px; }
+  .team-stat-value { font-size: 0.95rem; }
+  .team-stat-label { font-size: 0.65rem; }
+
+  /* Team rosters */
+  .team-rosters {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .team-roster-card { padding: 10px; }
+  .team-roster-title { font-size: 0.9rem; }
+  .team-roster-player { font-size: 0.78rem; padding: 5px 8px; }
+
+  /* Tables */
+  .table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+  .leaderboard-table { font-size: 0.75rem; }
+  .leaderboard-table th, .leaderboard-table td { padding: 7px 8px; }
+  .leaderboard-table th { font-size: 0.7rem; }
+
+  /* Hide some columns on tiny screens */
+  .leaderboard-table td:nth-child(5),
+  .leaderboard-table th:nth-child(5),
+  .leaderboard-table td:nth-child(6),
+  .leaderboard-table th:nth-child(6) {
+    display: none;
+  }
+
+  /* Bonus grid */
+  .bonus-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .bonus-card { padding: 0; }
+  .bonus-card-header { padding: 10px 12px; }
+  .bonus-icon { font-size: 1.2rem; }
+  .bonus-card-title { font-size: 0.85rem; }
+  .bonus-card-points { font-size: 0.65rem; }
+  .bonus-description { padding: 8px 12px 0 12px; font-size: 0.78rem; }
+  .bonus-card-body { padding: 10px 12px; }
+
+  .bonus-row { gap: 8px; padding: 4px 0; }
+  .bonus-name { font-size: 0.78rem; }
+  .bonus-value { font-size: 0.78rem; }
+  .bonus-pts { font-size: 0.7rem; }
+
+  /* Podium */
+  .podium { 
+    gap: 4px;
+    flex-direction: row;
+    align-items: flex-end;
+    padding: 16px 8px;
+    margin-bottom: 20px;
+  }
+
+  .podium-place { 
+    min-width: 90px;
+    padding: 8px 10px 0;
+    gap: 6px;
+  }
+
+  .podium-1st { height: 140px; }
+  .podium-2nd { height: 110px; }
+  .podium-3rd { height: 90px; }
+
+  .podium-medal { font-size: 1.4rem; }
+  .podium-team-name { font-size: 0.7rem; }
+  .podium-score { font-size: 0.95rem; }
+  .podium-score-label { font-size: 0.6rem; }
+
+  /* Charts */
+  .chart-section { padding: 14px 12px; margin-bottom: 20px; }
+  .chart-section h3 { font-size: 0.9rem; margin-bottom: 12px; }
+
+  .chart-row { gap: 10px; }
+  .chart-label { width: 70px; font-size: 0.65rem; text-align: right; }
+  .chart-bar-bg { height: 20px; }
+  .chart-bar-value { font-size: 0.65rem; right: 6px; }
+
+  .legend-item { font-size: 0.7rem; }
+  .legend-dot { width: 8px; height: 8px; }
+
+  /* Footer */
+  .site-footer { padding: 14px 0; font-size: 0.75rem; }
+  .site-footer code { font-size: 0.7em; padding: 1px 4px; }
+
+  /* Utilities */
+  .fw-bold { font-weight: 700; }
+}
+
+/* Extra small devices */
+@media (max-width: 400px) {
+  body { font-size: 13px; }
+
+  .header-title h1 { font-size: 0.9rem; }
+  .header-icon { font-size: 1.2rem; }
+
+  .section-header h2 { font-size: 1.1rem; }
+
+  .clock-value { font-size: 1.3rem; }
+  .clock-sep { font-size: 1.1rem; }
+
+  .info-card { flex-direction: column; text-align: center; }
+  .info-icon { font-size: 1.2rem; }
+
+  .quick-stats {
     grid-template-columns: 1fr 1fr;
   }
 
-  .clock-value { font-size: 1.8rem; }
-  .clock-sep { font-size: 1.8rem; }
+  .quick-stat-card { padding: 10px; }
+  .quick-stat-value { font-size: 1.1rem; }
+  .quick-stat-label { font-size: 0.6rem; }
 
-  .bonus-grid {
-    grid-template-columns: 1fr;
+  .section { padding: 16px 0 24px; }
+
+  .countdown-card { padding: 14px 10px; }
+
+  .team-card-name { font-size: 0.95rem; }
+
+  .leaderboard-table td:nth-child(4),
+  .leaderboard-table th:nth-child(4),
+  .leaderboard-table td:nth-child(5),
+  .leaderboard-table th:nth-child(5),
+  .leaderboard-table td:nth-child(6),
+  .leaderboard-table th:nth-child(6),
+  .leaderboard-table td:nth-child(7),
+  .leaderboard-table th:nth-child(7) {
+    display: none;
   }
 
-  .podium { gap: 6px; }
-  .podium-place { min-width: 100px; padding: 12px 12px 0; }
-  .podium-medal { font-size: 1.8rem; }
-  .podium-team-name { font-size: .82rem; }
-  .podium-score { font-size: 1.2rem; }
-
-  .leaderboard-table { font-size: .78rem; }
-  .leaderboard-table th, .leaderboard-table td { padding: 8px 10px; }
-
-  .chart-label { width: 80px; font-size: .72rem; }
-
-  .section-header h2 { font-size: 1.3rem; }
+  .podium-place { min-width: 70px; }
+  .podium-1st { height: 110px; }
+  .podium-2nd { height: 85px; }
+  .podium-3rd { height: 70px; }
+  .podium-medal { font-size: 1.1rem; }
+  .podium-team-name { font-size: 0.65rem; }
+  .podium-score { font-size: 0.8rem; }
 }
