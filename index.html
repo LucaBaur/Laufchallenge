@@ -28,6 +28,7 @@
           <button class="nav-btn" data-section="bonus">🎯 Bonus</button>
           <button class="nav-btn" data-section="final">🥇 Endstand</button>
         </nav>
+        <button class="data-switch-btn" id="dataSwitchBtn" type="button" aria-label="Zwischen Live- und Demo-Daten wechseln">🟢 Live</button>
         <button class="hamburger" id="hamburger" aria-label="Menu">☰</button>
       </div>
     </div>
@@ -44,6 +45,7 @@
 
       <div class="countdown-grid">
         <div class="countdown-card">
+          <p class="countdown-status" id="countdownStatus"></p>
           <div class="countdown-clock" id="countdownClock">
             <div class="clock-unit">
               <span class="clock-value" id="cdDays">--</span>
@@ -65,7 +67,6 @@
               <span class="clock-label">Sekunden</span>
             </div>
           </div>
-          <p class="countdown-status" id="countdownStatus"></p>
         </div>
 
         <div class="countdown-info-grid">
@@ -241,7 +242,7 @@
   <!-- ===== FOOTER ===== -->
   <footer class="site-footer">
     <div class="container">
-      <p>Handball Laufchallenge 2026 &bull; Daten werden aus <code>data.json</code> geladen</p>
+      <p>Handball Laufchallenge 2026 &bull; <span id="lastUpdatedText">Zuletzt aktualisiert: --</span></p>
     </div>
   </footer>
 

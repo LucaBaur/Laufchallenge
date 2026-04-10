@@ -131,6 +131,31 @@ a:hover { text-decoration: underline; }
   font-weight: 600;
 }
 
+.data-switch-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: .85rem;
+  transition: var(--transition);
+  white-space: nowrap;
+}
+
+.data-switch-btn:hover {
+  background: var(--surface2);
+  color: var(--text);
+  border-color: var(--accent);
+}
+
+.data-switch-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  font-weight: 600;
+}
+
 .hamburger {
   display: none;
   background: transparent;
@@ -227,7 +252,7 @@ a:hover { text-decoration: underline; }
 }
 
 .countdown-status {
-  margin-top: 16px;
+  margin: 0 0 16px;
   font-size: .95rem;
   color: var(--text-muted);
 }
@@ -872,6 +897,7 @@ a:hover { text-decoration: underline; }
   .main-nav.open { display: flex; }
 
   .hamburger { display: block; margin-left: auto; padding: 6px 10px; font-size: 1.2rem; }
+  .data-switch-btn { padding: 5px 10px; font-size: 0.78rem; }
 
   .header-title h1 { font-size: 0.95rem; font-weight: 700; }
   .header-title { min-width: auto; }

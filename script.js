@@ -17,14 +17,42 @@ let countdownInterval = null;
 const RUN_THRESHOLD_KM  = 4;   // minimum distance (km) for a bonus run
 const EARLY_BIRD_HOUR   = 8;   // runs starting before this hour count as Early Bird
 const NIGHT_RUNNER_HOUR = 20;  // runs starting at or after this hour count as Night Runner
+const LIVE_DATA_FILE    = 'data.json';
+const DEMO_DATA_FILE    = 'demo.json';
+const DATA_SOURCE_KEY   = 'laufchallenge_data_source';
 
 // ─────────────────────────────────────────────
 //  BOOTSTRAP
 // ─────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   setupNavigation();
+  setupDataSourceToggle();
   loadData();
 });
+
+function getSelectedDataFile() {
+  const mode = localStorage.getItem(DATA_SOURCE_KEY);
+  return mode === 'demo' ? DEMO_DATA_FILE : LIVE_DATA_FILE;
+}
+
+function setupDataSourceToggle() {
+  const btn = document.getElementById('dataSwitchBtn');
+  if (!btn) return;
+
+  const refreshBtn = () => {
+    const isDemo = getSelectedDataFile() === DEMO_DATA_FILE;
+    btn.textContent = isDemo ? '🧪 Demo' : '🟢 Live';
+    btn.classList.toggle('active', isDemo);
+  };
+
+  refreshBtn();
+
+  btn.addEventListener('click', () => {
+    const isDemo = getSelectedDataFile() === DEMO_DATA_FILE;
+    localStorage.setItem(DATA_SOURCE_KEY, isDemo ? 'live' : 'demo');
+    location.reload();
+  });
+}
 
 // ─────────────────────────────────────────────
 //  NAVIGATION
@@ -57,7 +85,9 @@ function setupNavigation() {
 //  DATA LOADING
 // ─────────────────────────────────────────────
 function loadData() {
-  fetch('data.json')
+  const dataFile = getSelectedDataFile();
+
+  fetch(dataFile)
     .then(res => {
       if (!res.ok) throw new Error('HTTP ' + res.status);
       return res.json();
@@ -67,9 +97,9 @@ function loadData() {
       initApp();
     })
     .catch(err => {
-      console.error('Failed to load data.json:', err);
+      console.error(`Failed to load ${dataFile}:`, err);
       document.querySelectorAll('.section').forEach(s => {
-        s.innerHTML = `<div class="error-msg">⚠️ Fehler beim Laden der Daten:<br>${err.message}<br><small>Stelle sicher, dass data.json im selben Ordner liegt.</small></div>`;
+        s.innerHTML = `<div class="error-msg">⚠️ Fehler beim Laden der Daten:<br>${err.message}<br><small>Stelle sicher, dass ${dataFile} im selben Ordner liegt.</small></div>`;
         s.classList.remove('active');
       });
       document.getElementById('countdown').classList.add('active');
@@ -81,6 +111,7 @@ function loadData() {
 // ─────────────────────────────────────────────
 function initApp() {
   document.getElementById('challengeName').textContent = data.challenge.name;
+  renderLastUpdated();
   initCountdown();
   renderQuickStats();
   renderTeamLeaderboard();
@@ -88,6 +119,65 @@ function initApp() {
   renderPlayerLeaderboard();
   renderBonusChallenges();
   renderFinalScore();
+}
+
+function renderLastUpdated() {
+  const el = document.getElementById('lastUpdatedText');
+  if (!el) return;
+
+  const sourceValue = data.lastUpdated || getLatestRunDateTime();
+  if (!sourceValue) {
+    el.textContent = 'Zuletzt aktualisiert: --';
+    return;
+  }
+
+  const parsedDate = parseDateTime(sourceValue);
+  if (!parsedDate) {
+    el.textContent = 'Zuletzt aktualisiert: --';
+    return;
+  }
+
+  el.textContent = `Zuletzt aktualisiert: ${formatDateTime(parsedDate)}`;
+}
+
+function getLatestRunDateTime() {
+  if (!Array.isArray(data.runs) || data.runs.length === 0) return null;
+
+  let latest = null;
+  data.runs.forEach(run => {
+    if (!run.date) return;
+    const isoDateTime = `${run.date}T${run.startTime || '00:00'}:00`;
+    const d = new Date(isoDateTime);
+    if (Number.isNaN(d.getTime())) return;
+    if (!latest || d > latest) latest = d;
+  });
+
+  return latest;
+}
+
+function parseDateTime(value) {
+  if (value instanceof Date) return value;
+  if (typeof value !== 'string' || !value.trim()) return null;
+
+  let normalized = value.trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(normalized)) {
+    normalized += 'T00:00:00';
+  } else if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(normalized)) {
+    normalized += ':00';
+  }
+
+  const d = new Date(normalized);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
+function formatDateTime(date) {
+  return date.toLocaleString('de-DE', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
 }
 
 // ─────────────────────────────────────────────
@@ -223,7 +313,7 @@ function initCountdown() {
     if (now < startDate) {
       // Before challenge starts – count down to start
       targetDate = startDate;
-      statusText = '🔔 Challenge startet in …';
+      statusText = '🔔 Challenge startet in:';
     } else if (now <= endDate) {
       // Challenge is running – count down to end
       targetDate = endDate;
@@ -948,6 +1038,7 @@ function getBonusChallengeDefinitions() {
     pointsLabel: '1→20 | 2→10 | 3→5',
     description: 'Spieler mit den meisten Höhenmetern über alle Läufe hinweg.',
     ranked: Object.entries(totals)
+      .filter(([, value]) => value > 0)
       .sort((a, b) => b[1] - a[1])
       .map(([pid, value]) => ({ pid, metric: value, valueLabel: value.toLocaleString('de-DE') + ' m' }))
   });
