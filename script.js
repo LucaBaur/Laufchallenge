@@ -20,6 +20,7 @@ const NIGHT_RUNNER_HOUR = 20;  // runs starting at or after this hour count as N
 const LIVE_DATA_FILE    = 'data.json';
 const DEMO_DATA_FILE    = 'demo.json';
 const DATA_SOURCE_KEY   = 'laufchallenge_data_source';
+const VISIT_COUNTER_API = 'https://api.countapi.xyz/hit/laufchallenge/github-pages';
 
 // ─────────────────────────────────────────────
 //  BOOTSTRAP
@@ -128,12 +129,25 @@ function renderVisitCounter() {
   if (!el) return;
 
   const STORAGE_KEY = 'laufchallenge_visit_count';
-  let count = parseInt(localStorage.getItem(STORAGE_KEY), 10);
-  if (!Number.isFinite(count) || count < 0) count = 0;
-  count += 1;
-  localStorage.setItem(STORAGE_KEY, String(count));
+  const showLocalCount = () => {
+    let count = parseInt(localStorage.getItem(STORAGE_KEY), 10);
+    if (!Number.isFinite(count) || count < 0) count = 0;
+    count += 1;
+    localStorage.setItem(STORAGE_KEY, String(count));
+    el.textContent = `• Website-Aufrufe: ${count}`;
+  };
 
-  el.textContent = `• Website-Aufrufe: ${count}`;
+  fetch(VISIT_COUNTER_API)
+    .then(res => res.json())
+    .then(json => {
+      if (json && Number.isFinite(json.value)) {
+        el.textContent = `• Website-Aufrufe: ${json.value}`;
+        localStorage.setItem(STORAGE_KEY, String(json.value));
+      } else {
+        showLocalCount();
+      }
+    })
+    .catch(() => showLocalCount());
 }
 
 function renderLastUpdated() {
