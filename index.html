@@ -177,6 +177,7 @@
               <th class="sortable-col active-sort" data-sort="distance" data-label="Kilometer">Kilometer ↓</th>
               <th class="sortable-col" data-sort="elevation" data-label="Höhenmeter">Höhenmeter ↕</th>
               <th class="sortable-col" data-sort="runs" data-label="Läufe">Läufe ↕</th>
+              <th class="sortable-col" data-sort="otherActivities" data-label="Andere Aktiv.">Andere sportliche Aktivitäten ↕</th>
               <th class="sortable-col" data-sort="longest_dist" data-label="Längste Dist.">Längste Dist. ↕</th>
               <th class="sortable-col" data-sort="longest_time" data-label="Längste Zeit">Längste Zeit ↕</th>
             </tr>
@@ -201,6 +202,12 @@
       </div>
 
       <div class="bonus-grid" id="bonusGrid"></div>
+
+      <div class="team-bonus-section">
+        <h3>Team-Einmalboni</h3>
+        <p class="section-sub">Jedes Team kann jeden Einmalbonus einmal erreichen.</p>
+        <div class="bonus-grid" id="teamBonusGrid"></div>
+      </div>
     </section>
 
     <!-- ===== FINAL SCORE SECTION ===== -->
@@ -223,6 +230,7 @@
               <th>Hauptpunkte</th>
               <th>Bonuspunkte</th>
               <th>Läufe &gt;4km Punkte</th>
+              <th>Aktivitäts-Punkte</th>
               <th>Gesamtpunkte</th>
             </tr>
           </thead>
@@ -242,7 +250,11 @@
   <!-- ===== FOOTER ===== -->
   <footer class="site-footer">
     <div class="container">
-      <p>Handball Laufchallenge 2026 &bull; <span id="lastUpdatedText">Zuletzt aktualisiert: --</span></p>
+      <p>
+        Handball Laufchallenge 2026 &bull; 
+        <span id="lastUpdatedText">Zuletzt aktualisiert: --</span>
+        <span id="visitCounterText" class="visit-counter">• Website-Aufrufe: --</span>
+      </p>
     </div>
   </footer>
 

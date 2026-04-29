@@ -112,13 +112,28 @@ function loadData() {
 function initApp() {
   document.getElementById('challengeName').textContent = data.challenge.name;
   renderLastUpdated();
+  renderVisitCounter();
   initCountdown();
   renderQuickStats();
   renderTeamLeaderboard();
   renderTeamRosters();
   renderPlayerLeaderboard();
   renderBonusChallenges();
+  renderTeamBonuses();
   renderFinalScore();
+}
+
+function renderVisitCounter() {
+  const el = document.getElementById('visitCounterText');
+  if (!el) return;
+
+  const STORAGE_KEY = 'laufchallenge_visit_count';
+  let count = parseInt(localStorage.getItem(STORAGE_KEY), 10);
+  if (!Number.isFinite(count) || count < 0) count = 0;
+  count += 1;
+  localStorage.setItem(STORAGE_KEY, String(count));
+
+  el.textContent = `• Website-Aufrufe: ${count}`;
 }
 
 function renderLastUpdated() {
@@ -208,6 +223,13 @@ function fmtDate(str) {
 // HELPER: pad number with leading zero
 function pad2(n) { return String(n).padStart(2, '0'); }
 
+function isOtherSportActivity(run) {
+  const activity = String(run.activity || run.type || run.sport || '').trim().toLowerCase();
+  if (!activity) return false;
+  const runningKeywords = new Set(['lauf', 'laufen', 'run', 'running', 'jog', 'jogging', 'lauftraining']);
+  return !runningKeywords.has(activity);
+}
+
 // HELPER: ISO week number (Mon = day 1)
 function getISOWeek(date) {
   const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
@@ -237,6 +259,7 @@ function computePlayerStats() {
       elevation: 0,
       longestDist: 0,
       longestTime: 0,
+      otherActivities: 0,
       runObjects: []
     };
   });
@@ -249,6 +272,7 @@ function computePlayerStats() {
     s.elevation += r.elevation;
     if (r.distance > s.longestDist) s.longestDist = r.distance;
     if (r.duration > s.longestTime) s.longestTime = r.duration;
+    if (isOtherSportActivity(r)) s.otherActivities++;
     s.runObjects.push(r);
   });
 
@@ -264,7 +288,7 @@ function computePlayerStats() {
 function computeTeamStats(playerStats) {
   const stats = {};
   data.teams.forEach(t => {
-    stats[t.id] = { id: t.id, runs: 0, distance: 0, elevation: 0, runsOver4: 0 };
+    stats[t.id] = { id: t.id, runs: 0, distance: 0, elevation: 0, runsOver4: 0, otherActivities: 0 };
   });
 
   data.runs.forEach(r => {
@@ -275,6 +299,7 @@ function computeTeamStats(playerStats) {
     ts.distance += r.distance;
     ts.elevation += r.elevation;
     if (r.distance > RUN_THRESHOLD_KM) ts.runsOver4++;
+    if (isOtherSportActivity(r)) ts.otherActivities++;
   });
 
   Object.values(stats).forEach(s => {
@@ -568,6 +593,7 @@ function renderPlayerTable(players) {
         <td class="fw-bold">${p.distance} km</td>
         <td>${p.elevation.toLocaleString('de-DE')} m</td>
         <td>${p.runs}</td>
+        <td>${p.otherActivities}</td>
         <td>${p.longestDist.toFixed(1)} km</td>
         <td>${p.longestTime} min</td>
       </tr>
@@ -736,6 +762,28 @@ function renderBonusChallenges() {
   grid.innerHTML = cards.join('');
 }
 
+function renderTeamBonuses() {
+  const grid = document.getElementById('teamBonusGrid');
+  if (!grid) return;
+
+  const bonuses = getTeamBonusDefinitions();
+  grid.innerHTML = bonuses.map(bonus => {
+    const rows = data.teams.map(team => ({
+      name: `${team.emoji} ${team.name}`,
+      value: bonus.achieved[team.id] ? 'Erreicht' : 'Ausstehend',
+      pts: bonus.achieved[team.id] ? bonus.points : 0
+    }));
+
+    return makeBonusCard(
+      bonus.title,
+      bonus.icon,
+      `${bonus.points} Punkte`,
+      rows,
+      bonus.description
+    );
+  }).join('');
+}
+
 /** Build a bonus card HTML string */
 function makeBonusCard(title, icon, pointsLabel, rows, description = '') {
   const rowsHtml = rows.slice(0, 3).map((r, i) => {
@@ -774,6 +822,118 @@ function makeBonusCard(title, icon, pointsLabel, rows, description = '') {
       </div>
     </div>
   `;
+}
+
+function getTeamBonusDefinitions() {
+  const weekKeys = getChallengeWeekKeys();
+  const playersByTeam = {};
+  data.players.forEach(p => {
+    playersByTeam[p.team] = playersByTeam[p.team] || [];
+    playersByTeam[p.team].push(p.id);
+  });
+
+  const runsByTeam = {};
+  data.teams.forEach(t => { runsByTeam[t.id] = new Set(); });
+  data.runs.forEach(r => {
+    const teamId = getPlayer(r.player).team;
+    if (runsByTeam[teamId]) runsByTeam[teamId].add(r.player);
+  });
+
+  const weeksByPlayer = {};
+  data.players.forEach(p => { weeksByPlayer[p.id] = new Set(); });
+  data.runs.forEach(r => {
+    const key = weekKey(r.date);
+    if (weeksByPlayer[r.player]) weeksByPlayer[r.player].add(key);
+  });
+
+  const definitions = [
+    {
+      id: 'team-run-each-player',
+      title: 'Alle Teammitglieder mindestens 1 Lauf',
+      icon: '🏃‍♀️',
+      points: 10,
+      description: 'Jedes Team erhält diesen Bonus, wenn alle Teammitglieder mindestens einen Lauf eingereicht haben.',
+      achieved: data.teams.reduce((acc, team) => {
+        const expectedPlayers = playersByTeam[team.id] || [];
+        const actualPlayers = Array.from(runsByTeam[team.id] || []);
+        acc[team.id] = expectedPlayers.length > 0 && expectedPlayers.every(pid => actualPlayers.includes(pid));
+        return acc;
+      }, {})
+    },
+    {
+      id: 'team-weekly-run',
+      title: 'Jede Woche mindestens 1 Lauf',
+      icon: '📅',
+      points: 20,
+      description: 'Jedes Team erhält diesen Bonus, wenn alle Teammitglieder in jeder Challenge-Woche mindestens einen Lauf absolviert haben.',
+      achieved: data.teams.reduce((acc, team) => {
+        const expectedPlayers = playersByTeam[team.id] || [];
+        acc[team.id] = expectedPlayers.length > 0 && expectedPlayers.every(pid => {
+          const playerWeeks = weeksByPlayer[pid] || new Set();
+          return weekKeys.every(key => playerWeeks.has(key));
+        });
+        return acc;
+      }, {})
+    },
+    {
+      id: 'team-renamed',
+      title: 'Neuer Teamname',
+      icon: '📝',
+      points: 10,
+      description: 'Dieser Bonus wird vergeben, wenn das Team einen neuen Namen ausgewählt hat.',
+      achieved: data.teams.reduce((acc, team) => {
+        acc[team.id] = Boolean(team.nameSelected);
+        return acc;
+      }, {})
+    },
+    {
+      id: 'team-logo',
+      title: 'Teamlogo entworfen',
+      icon: '🎨',
+      points: 15,
+      description: 'Dieser Bonus wird vergeben, wenn das Team ein eigenes Logo erstellt hat.',
+      achieved: data.teams.reduce((acc, team) => {
+        acc[team.id] = Boolean(team.logoDesigned);
+        return acc;
+      }, {})
+    },
+    {
+      id: 'team-photo',
+      title: 'Gemeinsames Gruppenbild',
+      icon: '📸',
+      points: 20,
+      description: 'Dieser Bonus wird vergeben, wenn das Team ein gemeinsames Gruppenfoto gemacht hat.',
+      achieved: data.teams.reduce((acc, team) => {
+        acc[team.id] = Boolean(team.groupPhoto);
+        return acc;
+      }, {})
+    },
+    {
+      id: 'team-coach-icecream',
+      title: 'Trainer zum Eis eingeladen',
+      icon: '🍦',
+      points: 10,
+      description: 'Dieser Bonus wird vergeben, wenn das Team seinen Trainer zum Eis eingeladen hat.',
+      achieved: data.teams.reduce((acc, team) => {
+        acc[team.id] = Boolean(team.coachIceCream);
+        return acc;
+      }, {})
+    }
+  ];
+
+  return definitions;
+}
+
+function getChallengeWeekKeys() {
+  const keys = new Set();
+  const start = new Date(data.challenge.startDate + 'T00:00:00');
+  const end = new Date(data.challenge.endDate + 'T00:00:00');
+  const current = new Date(start);
+  while (current <= end) {
+    keys.add(weekKey(current.toISOString().slice(0, 10)));
+    current.setDate(current.getDate() + 1);
+  }
+  return Array.from(keys).sort();
 }
 
 // Longest Run – Distance
@@ -1339,7 +1499,7 @@ function evaluateBonusChallenges(maxPerPlayer = 2) {
  * Rule: each player can receive bonus points in at most 2 challenges.
  * If a player reached 2 awards, they are excluded from later challenges and others move up.
  */
-function computeBonusPointsPerTeam() {
+function computePlayerBonusPointsPerTeam() {
   const teamPts = {};
   data.teams.forEach(t => { teamPts[t.id] = 0; });
 
@@ -1355,6 +1515,29 @@ function computeBonusPointsPerTeam() {
   });
 
   return teamPts;
+}
+
+function computeTeamBonusPoints() {
+  const bonusPoints = {};
+  data.teams.forEach(t => { bonusPoints[t.id] = 0; });
+  const bonuses = getTeamBonusDefinitions();
+  bonuses.forEach(bonus => {
+    data.teams.forEach(team => {
+      if (bonus.achieved[team.id]) {
+        bonusPoints[team.id] += bonus.points;
+      }
+    });
+  });
+  return bonusPoints;
+}
+
+function computeBonusPointsPerTeam() {
+  const playerBonusPts = computePlayerBonusPointsPerTeam();
+  const teamBonusPts = computeTeamBonusPoints();
+  data.teams.forEach(t => {
+    playerBonusPts[t.id] = (playerBonusPts[t.id] || 0) + (teamBonusPts[t.id] || 0);
+  });
+  return playerBonusPts;
 }
 
 // ─────────────────────────────────────────────
@@ -1378,15 +1561,20 @@ function renderFinalScore() {
 
   // Runs >4km points
   const run4Pts = {};
-  data.teams.forEach(t => { run4Pts[t.id] = tStats[t.id].runsOver4; });
+  const activityPts = {};
+  data.teams.forEach(t => {
+    run4Pts[t.id] = tStats[t.id].runsOver4;
+    activityPts[t.id] = tStats[t.id].otherActivities;
+  });
 
   // Final totals
   const finals = data.teams.map(t => ({
     ...t,
-    mainPts:  mainPts[t.id]  || 0,
-    bonusPts: bonusPts[t.id] || 0,
-    run4Pts:  run4Pts[t.id]  || 0,
-    total:    (mainPts[t.id] || 0) + (bonusPts[t.id] || 0) + (run4Pts[t.id] || 0)
+    mainPts:      mainPts[t.id]  || 0,
+    bonusPts:     bonusPts[t.id] || 0,
+    run4Pts:      run4Pts[t.id]  || 0,
+    activityPts:  activityPts[t.id] || 0,
+    total:        (mainPts[t.id] || 0) + (bonusPts[t.id] || 0) + (run4Pts[t.id] || 0) + (activityPts[t.id] || 0)
   })).sort((a, b) => b.total - a.total);
 
   // Podium
@@ -1414,6 +1602,7 @@ function renderFinalScore() {
         <td>${t.mainPts}</td>
         <td>${t.bonusPts}</td>
         <td>${t.run4Pts}</td>
+        <td>${t.activityPts}</td>
         <td class="fw-bold" style="color:var(--gold)">${t.total}</td>
       </tr>
     `;
@@ -1423,9 +1612,10 @@ function renderFinalScore() {
   const maxTotal = Math.max(...finals.map(t => t.total), 1);
   const chartEl = document.getElementById('finalChart');
   chartEl.innerHTML = finals.map(t => {
-    const mainW  = (t.mainPts  / maxTotal * 100).toFixed(1);
-    const bonusW = (t.bonusPts / maxTotal * 100).toFixed(1);
-    const run4W  = (t.run4Pts  / maxTotal * 100).toFixed(1);
+    const mainW      = (t.mainPts  / maxTotal * 100).toFixed(1);
+    const bonusW     = (t.bonusPts / maxTotal * 100).toFixed(1);
+    const run4W      = (t.run4Pts  / maxTotal * 100).toFixed(1);
+    const activityW  = (t.activityPts / maxTotal * 100).toFixed(1);
     return `
       <div class="chart-row">
         <div class="chart-label">${t.emoji} ${t.name}</div>
@@ -1433,6 +1623,7 @@ function renderFinalScore() {
           <div class="chart-bar-segment" style="width:${mainW}%; background:${t.color}" title="Hauptpunkte: ${t.mainPts}"></div>
           <div class="chart-bar-segment" style="width:${bonusW}%; background:${t.color}aa" title="Bonuspunkte: ${t.bonusPts}"></div>
           <div class="chart-bar-segment" style="width:${run4W}%;  background:${t.color}55" title=">4km Punkte: ${t.run4Pts}"></div>
+          <div class="chart-bar-segment" style="width:${activityW}%; background:${t.color}33" title="Aktivitäts-Punkte: ${t.activityPts}"></div>
         </div>
         <div class="fw-bold" style="min-width:40px; text-align:right; font-size:.9rem">${t.total}</div>
       </div>
@@ -1442,6 +1633,7 @@ function renderFinalScore() {
       <div class="legend-item"><div class="legend-dot" style="background:#888"></div> Hauptpunkte</div>
       <div class="legend-item"><div class="legend-dot" style="background:#888a"></div> Bonuspunkte</div>
       <div class="legend-item"><div class="legend-dot" style="background:#8885"></div> Läufe &gt;4km Punkte</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#88833"></div> Aktivitäts-Punkte</div>
     </div>
   `;
 }
