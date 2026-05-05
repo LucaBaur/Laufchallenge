@@ -25,6 +25,7 @@
           <button class="nav-btn active" data-section="countdown">⏱ Countdown</button>
           <button class="nav-btn" data-section="teams">🏆 Teams</button>
           <button class="nav-btn" data-section="players">👟 Spieler</button>
+          <button class="nav-btn" data-section="feed">📰 Feed</button>
           <button class="nav-btn" data-section="bonus">🎯 Bonus</button>
           <button class="nav-btn" data-section="final">🥇 Endstand</button>
         </nav>
@@ -191,6 +192,21 @@
         <h3>Top 10 Spieler – Kilometer</h3>
         <div class="chart-wrapper" id="playerChart"></div>
       </div>
+    </section>
+
+    <!-- ===== RUN FEED SECTION ===== -->
+    <section id="feed" class="section">
+      <div class="section-header">
+        <h2>📰 Neueste Läufe</h2>
+        <p class="section-sub">Zeigt die neusten Läufe zuerst. Filtere nach Team, um nur die Einträge deines Teams zu sehen.</p>
+      </div>
+
+      <div class="feed-controls">
+        <div class="feed-filter-label">Team-Filter:</div>
+        <div class="feed-filters" id="runFeedFilters"></div>
+      </div>
+
+      <div class="run-feed" id="runFeed"></div>
     </section>
 
     <!-- ===== BONUS CHALLENGES SECTION ===== -->

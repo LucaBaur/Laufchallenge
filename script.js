@@ -244,6 +244,14 @@ function isOtherSportActivity(run) {
   return !runningKeywords.has(activity);
 }
 
+function isRunningActivity(run) {
+  return !isOtherSportActivity(run);
+}
+
+function getRunEntries() {
+  return data.runs.filter(isRunningActivity);
+}
+
 // HELPER: ISO week number (Mon = day 1)
 function getISOWeek(date) {
   const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
@@ -281,12 +289,15 @@ function computePlayerStats() {
   data.runs.forEach(r => {
     const s = stats[r.player];
     if (!s) return;
-    s.runs++;
-    s.distance += r.distance;
-    s.elevation += r.elevation;
-    if (r.distance > s.longestDist) s.longestDist = r.distance;
-    if (r.duration > s.longestTime) s.longestTime = r.duration;
-    if (isOtherSportActivity(r)) s.otherActivities++;
+    if (isOtherSportActivity(r)) {
+      s.otherActivities++;
+    } else {
+      s.runs++;
+      s.distance += r.distance;
+      s.elevation += r.elevation;
+      if (r.distance > s.longestDist) s.longestDist = r.distance;
+      if (r.duration > s.longestTime) s.longestTime = r.duration;
+    }
     s.runObjects.push(r);
   });
 
@@ -309,11 +320,14 @@ function computeTeamStats(playerStats) {
     const p = getPlayer(r.player);
     const ts = stats[p.team];
     if (!ts) return;
-    ts.runs++;
-    ts.distance += r.distance;
-    ts.elevation += r.elevation;
-    if (r.distance > RUN_THRESHOLD_KM) ts.runsOver4++;
-    if (isOtherSportActivity(r)) ts.otherActivities++;
+    if (isOtherSportActivity(r)) {
+      ts.otherActivities++;
+    } else {
+      ts.runs++;
+      ts.distance += r.distance;
+      ts.elevation += r.elevation;
+      if (r.distance > RUN_THRESHOLD_KM) ts.runsOver4++;
+    }
   });
 
   Object.values(stats).forEach(s => {
@@ -409,10 +423,11 @@ function initCountdown() {
 // ─────────────────────────────────────────────
 function renderQuickStats() {
   const container = document.getElementById('quickStats');
-  const totalRuns = data.runs.length;
-  const totalKm   = Math.round(data.runs.reduce((s, r) => s + r.distance, 0) * 10) / 10;
-  const totalElev = data.runs.reduce((s, r) => s + r.elevation, 0);
-  const players   = new Set(data.runs.map(r => r.player)).size;
+  const runEntries = getRunEntries();
+  const totalRuns = runEntries.length;
+  const totalKm   = Math.round(runEntries.reduce((s, r) => s + r.distance, 0) * 10) / 10;
+  const totalElev = runEntries.reduce((s, r) => s + r.elevation, 0);
+  const players   = new Set(runEntries.map(r => r.player)).size;
 
   const items = [
     { value: totalRuns, label: 'Läufe gesamt' },
@@ -643,24 +658,24 @@ function computePlayerTopBonusChallenges() {
 
   // ── Longest dist
   const bestDist = {};
-  data.runs.forEach(r => { if (!bestDist[r.player] || r.distance > bestDist[r.player]) bestDist[r.player] = r.distance; });
+  getRunEntries().forEach(r => { if (!bestDist[r.player] || r.distance > bestDist[r.player]) bestDist[r.player] = r.distance; });
   registerPoints(Object.entries(bestDist).sort((a, b) => b[1] - a[1]), BONUS_STD, 'Längster Lauf (Distanz)');
 
   // ── Longest time
   const bestTime = {};
-  data.runs.forEach(r => { if (!bestTime[r.player] || r.duration > bestTime[r.player]) bestTime[r.player] = r.duration; });
+  getRunEntries().forEach(r => { if (!bestTime[r.player] || r.duration > bestTime[r.player]) bestTime[r.player] = r.duration; });
   registerPoints(Object.entries(bestTime).sort((a, b) => b[1] - a[1]), BONUS_STD, 'Längster Lauf (Zeit)');
 
   // ── Total elevation
   const totElev = {};
   data.players.forEach(p => { totElev[p.id] = 0; });
-  data.runs.forEach(r => { if (totElev[r.player] !== undefined) totElev[r.player] += r.elevation; });
+  getRunEntries().forEach(r => { if (totElev[r.player] !== undefined) totElev[r.player] += r.elevation; });
   registerPoints(Object.entries(totElev).sort((a, b) => b[1] - a[1]), BONUS_STD, 'Gesamthöhenmeter');
 
   // ── Best duo
   const pairCounts = {};
   data.players.forEach(p => { pairCounts[p.id] = {}; });
-  data.runs.forEach(r => {
+  getRunEntries().forEach(r => {
     if (!pairCounts[r.player]) return;
     r.partners.forEach(pid => { pairCounts[r.player][pid] = (pairCounts[r.player][pid] || 0) + 1; });
   });
@@ -674,7 +689,7 @@ function computePlayerTopBonusChallenges() {
   // ── Team rotation
   const partnerSets = {};
   data.players.forEach(p => { partnerSets[p.id] = new Set(); });
-  data.runs.forEach(r => {
+  getRunEntries().forEach(r => {
     if (!partnerSets[r.player]) return;
     r.partners.forEach(pid => partnerSets[r.player].add(pid));
   });
@@ -686,7 +701,7 @@ function computePlayerTopBonusChallenges() {
   // ── Double agent
   const crossRuns = {};
   data.players.forEach(p => { crossRuns[p.id] = 0; });
-  data.runs.forEach(r => {
+  getRunEntries().forEach(r => {
     const pt = getPlayer(r.player).team;
     if (r.partners.some(pid => getPlayer(pid).team !== pt)) crossRuns[r.player]++;
   });
@@ -695,7 +710,7 @@ function computePlayerTopBonusChallenges() {
   // ── Longest streak
   const datesByPlayer = {};
   data.players.forEach(p => { datesByPlayer[p.id] = new Set(); });
-  data.runs.forEach(r => { if (datesByPlayer[r.player]) datesByPlayer[r.player].add(r.date); });
+  getRunEntries().forEach(r => { if (datesByPlayer[r.player]) datesByPlayer[r.player].add(r.date); });
   const streaks = {};
   Object.entries(datesByPlayer).forEach(([pid, dateSet]) => {
     if (dateSet.size === 0) { streaks[pid] = 0; return; }
@@ -848,14 +863,14 @@ function getTeamBonusDefinitions() {
 
   const runsByTeam = {};
   data.teams.forEach(t => { runsByTeam[t.id] = new Set(); });
-  data.runs.forEach(r => {
+  getRunEntries().forEach(r => {
     const teamId = getPlayer(r.player).team;
     if (runsByTeam[teamId]) runsByTeam[teamId].add(r.player);
   });
 
   const weeksByPlayer = {};
   data.players.forEach(p => { weeksByPlayer[p.id] = new Set(); });
-  data.runs.forEach(r => {
+  getRunEntries().forEach(r => {
     const key = weekKey(r.date);
     if (weeksByPlayer[r.player]) weeksByPlayer[r.player].add(key);
   });
@@ -953,7 +968,7 @@ function getChallengeWeekKeys() {
 // Longest Run – Distance
 function buildBonusLongestDist(playerBonusCount) {
   const best = {};
-  data.runs.forEach(r => {
+  getRunEntries().forEach(r => {
     if (!best[r.player] || r.distance > best[r.player]) best[r.player] = r.distance;
   });
   const ranked = Object.entries(best).sort((a, b) => b[1] - a[1]);
@@ -967,7 +982,7 @@ function buildBonusLongestDist(playerBonusCount) {
 // Longest Run – Time
 function buildBonusLongestTime(playerBonusCount) {
   const best = {};
-  data.runs.forEach(r => {
+  getRunEntries().forEach(r => {
     if (!best[r.player] || r.duration > best[r.player]) best[r.player] = r.duration;
   });
   const ranked = Object.entries(best).sort((a, b) => b[1] - a[1]);
@@ -982,7 +997,7 @@ function buildBonusLongestTime(playerBonusCount) {
 function buildBonusTotalElev(playerBonusCount) {
   const totals = {};
   data.players.forEach(p => { totals[p.id] = 0; });
-  data.runs.forEach(r => { if (totals[r.player] !== undefined) totals[r.player] += r.elevation; });
+  getRunEntries().forEach(r => { if (totals[r.player] !== undefined) totals[r.player] += r.elevation; });
   const ranked = Object.entries(totals).sort((a, b) => b[1] - a[1]);
   const awarded = awardBonusRanking(ranked, BONUS_STD, playerBonusCount);
   return makeBonusCard('Gesamthöhenmeter', '⛰️', '1→20 | 2→10 | 3→5',
@@ -998,7 +1013,7 @@ function buildBonusBestDuo(playerBonusCount) {
   const pairCounts = {}; // { pid: { partnerPid: count } }
   data.players.forEach(p => { pairCounts[p.id] = {}; });
 
-  data.runs.forEach(r => {
+  getRunEntries().forEach(r => {
     if (!pairCounts[r.player]) return;
     r.partners.forEach(partnerId => {
       pairCounts[r.player][partnerId] = (pairCounts[r.player][partnerId] || 0) + 1;
@@ -1044,7 +1059,7 @@ function buildBonusTeamRotation(playerBonusCount) {
   const partnerSets = {}; // { pid: Set<partnerId> }
   data.players.forEach(p => { partnerSets[p.id] = new Set(); });
 
-  data.runs.forEach(r => {
+  getRunEntries().forEach(r => {
     if (!partnerSets[r.player]) return;
     r.partners.forEach(partnerId => partnerSets[r.player].add(partnerId));
   });
@@ -1066,7 +1081,7 @@ function buildBonusDoubleAgent(playerBonusCount) {
   const crossRuns = {}; // { pid: count }
   data.players.forEach(p => { crossRuns[p.id] = 0; });
 
-  data.runs.forEach(r => {
+  getRunEntries().forEach(r => {
     const playerTeam = getPlayer(r.player).team;
     const hasCrossTeam = r.partners.some(pid => getPlayer(pid).team !== playerTeam);
     if (hasCrossTeam) crossRuns[r.player]++;
@@ -1091,7 +1106,7 @@ function buildBonusLongestStreak(playerBonusCount) {
   // Group run dates by player
   const datesByPlayer = {};
   data.players.forEach(p => { datesByPlayer[p.id] = new Set(); });
-  data.runs.forEach(r => {
+  getRunEntries().forEach(r => {
     if (datesByPlayer[r.player]) datesByPlayer[r.player].add(r.date);
   });
 
@@ -1154,7 +1169,7 @@ function buildBonusNightRunner(playerBonusCount) {
 function countRunsByTimeThreshold(hourPredicate) {
   const counts = {};
   data.players.forEach(p => { counts[p.id] = 0; });
-  data.runs.forEach(r => {
+  getRunEntries().forEach(r => {
     if (!r.startTime) return;
     const h = parseInt(r.startTime.split(':')[0], 10);
     if (hourPredicate(h)) counts[r.player]++;
@@ -1168,7 +1183,7 @@ function getBonusChallengeDefinitions() {
 
   // Longest Run (Distance)
   const bestDist = {};
-  data.runs.forEach(r => {
+  getRunEntries().forEach(r => {
     if (!bestDist[r.player] || r.distance > bestDist[r.player]) bestDist[r.player] = r.distance;
   });
   definitions.push({
@@ -1185,7 +1200,7 @@ function getBonusChallengeDefinitions() {
 
   // Longest Run (Time)
   const bestTime = {};
-  data.runs.forEach(r => {
+  getRunEntries().forEach(r => {
     if (!bestTime[r.player] || r.duration > bestTime[r.player]) bestTime[r.player] = r.duration;
   });
   definitions.push({
@@ -1203,7 +1218,7 @@ function getBonusChallengeDefinitions() {
   // Total elevation
   const totals = {};
   data.players.forEach(p => { totals[p.id] = 0; });
-  data.runs.forEach(r => { if (totals[r.player] !== undefined) totals[r.player] += r.elevation; });
+  getRunEntries().forEach(r => { if (totals[r.player] !== undefined) totals[r.player] += r.elevation; });
   definitions.push({
     id: 'total-elevation',
     title: 'Gesamthöhenmeter',
@@ -1220,7 +1235,7 @@ function getBonusChallengeDefinitions() {
   // Best duo (pair ranking: both players share one place)
   const pairCounts = {};
   const seenPairEvents = new Set();
-  data.runs.forEach(r => {
+  getRunEntries().forEach(r => {
     r.partners.forEach(partnerId => {
       const pair = [r.player, partnerId].sort();
       const pairKey = pair.join('|');
@@ -1266,7 +1281,7 @@ function getBonusChallengeDefinitions() {
   // Team rotation
   const partnerSets = {};
   data.players.forEach(p => { partnerSets[p.id] = new Set(); });
-  data.runs.forEach(r => {
+  getRunEntries().forEach(r => {
     if (!partnerSets[r.player]) return;
     r.partners.forEach(partnerId => partnerSets[r.player].add(partnerId));
   });
@@ -1286,7 +1301,7 @@ function getBonusChallengeDefinitions() {
   // Double agent
   const crossRuns = {};
   data.players.forEach(p => { crossRuns[p.id] = 0; });
-  data.runs.forEach(r => {
+  getRunEntries().forEach(r => {
     const playerTeam = getPlayer(r.player).team;
     const hasCrossTeam = r.partners.some(pid => getPlayer(pid).team !== playerTeam);
     if (hasCrossTeam) crossRuns[r.player]++;
@@ -1307,7 +1322,7 @@ function getBonusChallengeDefinitions() {
   // Longest streak
   const datesByPlayer = {};
   data.players.forEach(p => { datesByPlayer[p.id] = new Set(); });
-  data.runs.forEach(r => {
+  getRunEntries().forEach(r => {
     if (datesByPlayer[r.player]) datesByPlayer[r.player].add(r.date);
   });
   const streaks = [];

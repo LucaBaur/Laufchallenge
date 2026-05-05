@@ -134,5 +134,190 @@
             "gender": "f"
         }
     ],
-    "runs": []
+    "runs": [
+        {
+            "id": "r001",
+            "player": "p3",
+            "date": "2026-05-04",
+            "startTime": "07:23",
+            "distance": 4.02,
+            "elevation": 30,
+            "duration": 29.366666666666667,
+            "partners": []
+        },
+        {
+            "id": "a001",
+            "player": "p13",
+            "date": "2026-05-04",
+            "startTime": "18:00",
+            "distance": 12.3,
+            "elevation": 0,
+            "duration": 52,
+            "activity": "Radfahren",
+            "partners": []
+        },
+        {
+            "id": "a002",
+            "player": "p1",
+            "date": "2026-05-05",
+            "startTime": "17:10",
+            "distance": 14.3,
+            "elevation": 0,
+            "duration": 73,
+            "partners": []
+        },
+        {
+            "id": "r002",
+            "player": "p16",
+            "date": "2026-05-05",
+            "startTime": "15:00",
+            "distance": 8.0,
+            "elevation": 0,
+            "duration": 42.6,
+            "partners": []
+        },
+        {
+            "id": "a003",
+            "player": "p14",
+            "date": "2026-05-04",
+            "distance": 12.0,
+            "elevation": 0,
+            "duration": 36.0,
+            "partners": [],
+            "activity": "Radfahren",
+            "startTime": "18:00"
+        },
+        {
+            "id": "a004",
+            "player": "p14",
+            "date": "2026-05-05",
+            "distance": 12.0,
+            "elevation": 0,
+            "duration": 40.0,
+            "partners": [],
+            "activity": "Radfahren",
+            "startTime": "18:00"
+        },
+        {
+            "id": "a005",
+            "player": "p14",
+            "date": "2026-05-05",
+            "startTime": "18:00",
+            "distance": 0.0,
+            "elevation": 0,
+            "duration": 30.0,
+            "partners": [],
+            "activity": "Yoga"
+        },
+        {
+            "id": "r003",
+            "player": "p9",
+            "date": "2026-05-04",
+            "startTime": "19:00",
+            "distance": 5.0,
+            "elevation": 0,
+            "duration": 90.0,
+            "partners": []
+        },
+        {
+            "id": "r004",
+            "player": "p7",
+            "date": "2026-05-04",
+            "startTime": "19:00",
+            "distance": 5.0,
+            "elevation": 0,
+            "duration": 90.0,
+            "partners": []
+        },
+        {
+            "id": "r005",
+            "player": "p1",
+            "date": "2026-05-04",
+            "startTime": "19:00",
+            "distance": 5.0,
+            "elevation": 0,
+            "duration": 90.0,
+            "partners": []
+        },
+        {
+            "id": "r006",
+            "player": "p8",
+            "date": "2026-05-04",
+            "startTime": "19:00",
+            "distance": 5.0,
+            "elevation": 0,
+            "duration": 90.0,
+            "partners": []
+        },
+        {
+            "id": "r007",
+            "player": "p15",
+            "date": "2026-05-04",
+            "startTime": "19:00",
+            "distance": 5.0,
+            "elevation": 0,
+            "duration": 90.0,
+            "partners": []
+        },
+        {
+            "id": "r008",
+            "player": "p10",
+            "date": "2026-05-04",
+            "startTime": "19:00",
+            "distance": 5.0,
+            "elevation": 0,
+            "duration": 90.0,
+            "partners": []
+        },
+        {
+            "id": "r009",
+            "player": "p14",
+            "date": "2026-05-04",
+            "startTime": "19:00",
+            "distance": 5.0,
+            "elevation": 0,
+            "duration": 90.0,
+            "partners": []
+        },
+        {
+            "id": "r010",
+            "player": "p18",
+            "date": "2026-05-04",
+            "startTime": "19:00",
+            "distance": 5.0,
+            "elevation": 0,
+            "duration": 90.0,
+            "partners": []
+        },
+        {
+            "id": "r011",
+            "player": "p3",
+            "date": "2026-05-04",
+            "startTime": "19:00",
+            "distance": 5.0,
+            "elevation": 0,
+            "duration": 90.0,
+            "partners": []
+        },
+        {
+            "id": "r012",
+            "player": "p2",
+            "date": "2026-05-04",
+            "startTime": "19:00",
+            "distance": 5.0,
+            "elevation": 0,
+            "duration": 90.0,
+            "partners": []
+        },
+        {
+            "id": "r013",
+            "player": "p15",
+            "date": "2026-05-05",
+            "startTime": "18:00",
+            "distance": 2.0,
+            "elevation": 0,
+            "duration": 25.0,
+            "partners": []
+        }
+    ]
 }
