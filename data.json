@@ -318,6 +318,17 @@
             "elevation": 0,
             "duration": 25.0,
             "partners": []
+        },
+        {
+            "id": "a006",
+            "player": "p16",
+            "date": "2026-05-05",
+            "startTime": "17:00",
+            "distance": 0.0,
+            "elevation": 0,
+            "duration": 25.0,
+            "partners": [],
+            "activity": "Pilates"
         }
     ]
 }
