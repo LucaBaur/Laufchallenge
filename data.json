@@ -8,19 +8,19 @@
         {
             "id": "team1",
             "name": "Wölfe",
-            "color": "#e74c3c",
+            "color": "#dc3545",
             "emoji": "🐺"
         },
         {
             "id": "team2",
             "name": "Adler",
-            "color": "#3498db",
+            "color": "#007bff",
             "emoji": "🦅"
         },
         {
             "id": "team3",
             "name": "Löwen",
-            "color": "#f39c12",
+            "color": "#28a745",
             "emoji": "🦁"
         }
     ],
@@ -329,6 +329,16 @@
             "duration": 25.0,
             "partners": [],
             "activity": "Pilates"
+        },
+        {
+            "id": "r014",
+            "player": "p17",
+            "date": "2026-05-05",
+            "startTime": "12:00",
+            "distance": 6.0,
+            "elevation": 0,
+            "duration": 39.0,
+            "partners": []
         }
     ]
 }

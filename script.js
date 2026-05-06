@@ -119,6 +119,7 @@ function initApp() {
   renderTeamLeaderboard();
   renderTeamRosters();
   renderPlayerLeaderboard();
+  renderRunFeed();
   renderBonusChallenges();
   renderTeamBonuses();
   renderFinalScore();
@@ -236,6 +237,11 @@ function fmtDate(str) {
 
 // HELPER: pad number with leading zero
 function pad2(n) { return String(n).padStart(2, '0'); }
+
+function hexToRgb(hex) {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : '0,0,0';
+}
 
 function isOtherSportActivity(run) {
   const activity = String(run.activity || run.type || run.sport || '').trim().toLowerCase();
@@ -1624,8 +1630,9 @@ function renderFinalScore() {
   const tbody = document.getElementById('finalTableBody');
   tbody.innerHTML = finals.map((t, idx) => {
     const rank = idx + 1;
+    const teamBg = `background: rgba(${hexToRgb(t.color)}, 0.1);`;
     return `
-      <tr>
+      <tr style="${teamBg}">
         <td><span class="rank-badge rank-${rank <= 3 ? rank : 'n'}">${rank}</span></td>
         <td><span style="font-size:1.2rem">${t.emoji}</span> <strong style="color:${t.color}">${t.name}</strong></td>
         <td>${t.mainPts}</td>
@@ -1690,4 +1697,98 @@ function renderBarChart(containerId, items) {
       </div>
     `;
   }).join('');
+}
+
+// ─────────────────────────────────────────────
+//  RUN FEED
+// ─────────────────────────────────────────────
+function renderRunFeed() {
+  const runEntries = getRunEntries();
+  const filtersEl = document.getElementById('runFeedFilters');
+  const feedEl = document.getElementById('runFeed');
+
+  if (!filtersEl || !feedEl) return;
+
+  // Sort runs by date descending (newest first)
+  const sortedRuns = runEntries.slice().sort((a, b) => {
+    const dateA = new Date(`${a.date}T${a.startTime || '00:00'}:00`);
+    const dateB = new Date(`${b.date}T${b.startTime || '00:00'}:00`);
+    return dateB - dateA;
+  });
+
+  // Create team filters
+  const teamFilters = data.teams.map(team => ({
+    id: team.id,
+    name: team.name,
+    emoji: team.emoji,
+    color: team.color,
+    checked: true // default all checked
+  }));
+
+  filtersEl.innerHTML = teamFilters.map(team => `
+    <label class="run-feed-filter" style="background: ${team.color}; border-color: ${team.color}; color: white;">
+      <input type="checkbox" value="${team.id}" checked>
+      <span class="team-pill" style="background: rgba(255,255,255,0.2); color: white;">${team.emoji} ${team.name}</span>
+    </label>
+  `).join('');
+
+  // Filter function
+  function filterRuns() {
+    const checkedTeams = Array.from(filtersEl.querySelectorAll('input:checked')).map(cb => cb.value);
+    const filteredRuns = sortedRuns.filter(run => {
+      const player = getPlayer(run.player);
+      return checkedTeams.includes(player.team);
+    });
+
+    renderRunCards(filteredRuns);
+  }
+
+  // Attach filter listeners
+  filtersEl.addEventListener('change', filterRuns);
+
+  // Initial render
+  filterRuns();
+
+  function renderRunCards(runs) {
+    if (runs.length === 0) {
+      feedEl.innerHTML = `
+        <div class="run-feed-empty">
+          <p>Keine Läufe gefunden für die ausgewählten Teams.</p>
+          <p>Versuche, mehr Teams auszuwählen.</p>
+        </div>
+      `;
+      return;
+    }
+
+    feedEl.innerHTML = runs.map(run => {
+      const player = getPlayer(run.player);
+      const team = getTeam(player.team);
+      const date = fmtDate(run.date);
+      const time = run.startTime || '--:--';
+      const duration = run.duration ? `${run.duration} min` : '--';
+      const elevation = run.elevation ? `${run.elevation} m` : '--';
+      const partners = run.partners && run.partners.length > 0
+        ? run.partners.map(pid => getPlayer(pid).name).join(', ')
+        : 'Solo';
+
+      return `
+        <div class="run-card" style="border-left-color: ${team.color}">
+          <div class="run-card-header">
+            <div class="run-card-title">${player.name}</div>
+            <div class="run-card-distance">${run.distance} km</div>
+          </div>
+          <div class="run-card-meta">
+            <span><strong>Datum:</strong> ${date}</span>
+            <span><strong>Startzeit:</strong> ${time}</span>
+            <span><strong>Dauer:</strong> ${duration}</span>
+            <span><strong>Höhenmeter:</strong> ${elevation}</span>
+          </div>
+          <div class="run-card-player">
+            <strong>Team:</strong> <span class="team-pill" style="background:${team.color}">${team.emoji} ${team.name}</span><br>
+            <strong>Partner:</strong> ${partners}
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
 }
