@@ -1703,14 +1703,14 @@ function renderBarChart(containerId, items) {
 //  RUN FEED
 // ─────────────────────────────────────────────
 function renderRunFeed() {
-  const runEntries = getRunEntries();
+  const allActivities = data.runs.slice(); // Alle Aktivitäten
   const filtersEl = document.getElementById('runFeedFilters');
   const feedEl = document.getElementById('runFeed');
 
   if (!filtersEl || !feedEl) return;
 
-  // Sort runs by date descending (newest first)
-  const sortedRuns = runEntries.slice().sort((a, b) => {
+  // Sort activities by date descending (newest first)
+  const sortedActivities = allActivities.slice().sort((a, b) => {
     const dateA = new Date(`${a.date}T${a.startTime || '00:00'}:00`);
     const dateB = new Date(`${b.date}T${b.startTime || '00:00'}:00`);
     return dateB - dateA;
@@ -1733,55 +1733,59 @@ function renderRunFeed() {
   `).join('');
 
   // Filter function
-  function filterRuns() {
+  function filterActivities() {
     const checkedTeams = Array.from(filtersEl.querySelectorAll('input:checked')).map(cb => cb.value);
-    const filteredRuns = sortedRuns.filter(run => {
-      const player = getPlayer(run.player);
+    const filteredActivities = sortedActivities.filter(activity => {
+      const player = getPlayer(activity.player);
       return checkedTeams.includes(player.team);
     });
 
-    renderRunCards(filteredRuns);
+    renderActivityCards(filteredActivities);
   }
 
   // Attach filter listeners
-  filtersEl.addEventListener('change', filterRuns);
+  filtersEl.addEventListener('change', filterActivities);
 
   // Initial render
-  filterRuns();
+  filterActivities();
 
-  function renderRunCards(runs) {
-    if (runs.length === 0) {
+  function renderActivityCards(activities) {
+    if (activities.length === 0) {
       feedEl.innerHTML = `
         <div class="run-feed-empty">
-          <p>Keine Läufe gefunden für die ausgewählten Teams.</p>
+          <p>Keine Aktivitäten gefunden für die ausgewählten Teams.</p>
           <p>Versuche, mehr Teams auszuwählen.</p>
         </div>
       `;
       return;
     }
 
-    feedEl.innerHTML = runs.map(run => {
-      const player = getPlayer(run.player);
+    feedEl.innerHTML = activities.map(activity => {
+      const player = getPlayer(activity.player);
       const team = getTeam(player.team);
-      const date = fmtDate(run.date);
-      const time = run.startTime || '--:--';
-      const duration = run.duration ? `${run.duration} min` : '--';
-      const elevation = run.elevation ? `${run.elevation} m` : '--';
-      const partners = run.partners && run.partners.length > 0
-        ? run.partners.map(pid => getPlayer(pid).name).join(', ')
+      const date = fmtDate(activity.date);
+      const time = activity.startTime || '--:--';
+      const duration = activity.duration ? `${activity.duration} min` : '--';
+      const elevation = activity.elevation ? `${activity.elevation} m` : '--';
+      const partners = activity.partners && activity.partners.length > 0
+        ? activity.partners.map(pid => getPlayer(pid).name).join(', ')
         : 'Solo';
+
+      const isRunning = isRunningActivity(activity);
+      const activityType = activity.activity || 'Lauf';
+      const distanceDisplay = isRunning ? `${activity.distance} km` : activityType;
 
       return `
         <div class="run-card" style="border-left-color: ${team.color}">
           <div class="run-card-header">
             <div class="run-card-title">${player.name}</div>
-            <div class="run-card-distance">${run.distance} km</div>
+            <div class="run-card-distance">${distanceDisplay}</div>
           </div>
           <div class="run-card-meta">
             <span><strong>Datum:</strong> ${date}</span>
             <span><strong>Startzeit:</strong> ${time}</span>
             <span><strong>Dauer:</strong> ${duration}</span>
-            <span><strong>Höhenmeter:</strong> ${elevation}</span>
+            ${isRunning ? `<span><strong>Höhenmeter:</strong> ${elevation}</span>` : ''}
           </div>
           <div class="run-card-player">
             <strong>Team:</strong> <span class="team-pill" style="background:${team.color}">${team.emoji} ${team.name}</span><br>

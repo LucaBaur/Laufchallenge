@@ -423,6 +423,89 @@
             "elevation": 0,
             "duration": 31.0,
             "partners": []
+        },
+        {
+            "id": "a011",
+            "player": "p4",
+            "date": "2026-05-04",
+            "startTime": "16:00",
+            "distance": 0.0,
+            "elevation": 0,
+            "duration": 40.0,
+            "partners": [],
+            "activity": "Sonstiges"
+        },
+        {
+            "id": "a012",
+            "player": "p4",
+            "date": "2026-05-06",
+            "startTime": "17:00",
+            "distance": 0.0,
+            "elevation": 0,
+            "duration": 40.0,
+            "partners": [],
+            "activity": "Sonstiges"
+        },
+        {
+            "id": "r019",
+            "player": "p16",
+            "date": "2026-05-08",
+            "startTime": "08:00",
+            "distance": 8.5,
+            "elevation": 0,
+            "duration": 46.0,
+            "partners": []
+        },
+        {
+            "id": "r020",
+            "player": "p14",
+            "date": "2026-05-07",
+            "startTime": "19:00",
+            "distance": 5.66,
+            "elevation": 180,
+            "duration": 44.31666666666667,
+            "partners": []
+        },
+        {
+            "id": "r021",
+            "player": "p11",
+            "date": "2026-05-07",
+            "startTime": "17:00",
+            "distance": 6.5,
+            "elevation": 0,
+            "duration": 37.93333333333333,
+            "partners": []
+        },
+        {
+            "id": "r022",
+            "player": "p17",
+            "date": "2026-05-07",
+            "startTime": "17:00",
+            "distance": 5.0,
+            "elevation": 0,
+            "duration": 28.933333333333334,
+            "partners": []
+        },
+        {
+            "id": "r023",
+            "player": "p13",
+            "date": "2026-05-07",
+            "startTime": "15:00",
+            "distance": 2.2,
+            "elevation": 38,
+            "duration": 43.0,
+            "partners": []
+        },
+        {
+            "id": "a013",
+            "player": "p1",
+            "date": "2026-05-07",
+            "startTime": "18:00",
+            "distance": 3.0,
+            "elevation": 0,
+            "duration": 60.0,
+            "partners": [],
+            "activity": "Schwimmen"
         }
     ]
 }
