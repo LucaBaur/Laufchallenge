@@ -1808,8 +1808,11 @@ function renderRunFeed() {
         });
       }
       
+      const imageSrc = activity.image || mainPlayer.portrait || '';
+      const imageAlt = activity.image ? 'Lauf Bild' : mainPlayer.portrait ? `${mainPlayer.name} Porträt` : '';
+
       // Create stripe border for duo runs
-      let cardClasses = activity.image ? 'has-image' : '';
+      let cardClasses = imageSrc ? 'has-image' : '';
       let color1 = mainTeam.color;
       let color2 = mainTeam.color;
       
@@ -1844,7 +1847,7 @@ function renderRunFeed() {
         </span>`;
       }
       
-      const imageHtml = activity.image ? `<div class="run-card-image"><img src="${activity.image}" alt="Lauf Bild" /></div>` : '';
+      const imageHtml = imageSrc ? `<div class="run-card-image"><img src="${imageSrc}" alt="${imageAlt}" /></div>` : '';
 
       return `
         <div class="run-card ${cardClasses}" style="--color-1: ${color1}; --color-2: ${color2}">

@@ -125,7 +125,8 @@
             "id": "p16",
             "name": "Marie",
             "team": "team3",
-            "gender": "f"
+            "gender": "f",
+            "portrait": "p16.jpeg"
         },
         {
             "id": "p17",
