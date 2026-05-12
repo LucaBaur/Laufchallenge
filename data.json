@@ -829,6 +829,38 @@
                 "p13"
             ],
             "image": "r034.jpeg"
+        },
+        {
+            "id": "a034",
+            "player": "p5",
+            "date": "2026-05-11",
+            "startTime": "20:00",
+            "distance": 0.0,
+            "elevation": 0,
+            "duration": 60.0,
+            "partners": [],
+            "activity": "Krafttraining"
+        },
+        {
+            "id": "a035",
+            "player": "p10",
+            "date": "2026-05-11",
+            "startTime": "21:00",
+            "distance": 0.0,
+            "elevation": 0,
+            "duration": 55.0,
+            "partners": [],
+            "activity": "Krafttraining"
+        },
+        {
+            "id": "r035",
+            "player": "p17",
+            "date": "2026-05-12",
+            "startTime": "11:00",
+            "distance": 7.5,
+            "elevation": 0,
+            "duration": 40.0,
+            "partners": []
         }
     ]
 }
