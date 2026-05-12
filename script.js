@@ -820,14 +820,11 @@ function renderTeamBonuses() {
 
   const bonuses = getTeamBonusDefinitions();
   grid.innerHTML = bonuses.map(bonus => {
-    const rows = data.teams.map(team => {
-      const logoHtml = team.logo ? `<div class="bonus-team-logo"><img src="${team.logo}" alt="${team.name} Logo" /></div>` : '';
-      return {
-        name: `${logoHtml}<span>${team.emoji} ${team.name}</span>`,
-        value: bonus.achieved[team.id] ? 'Erreicht' : 'Ausstehend',
-        pts: bonus.achieved[team.id] ? bonus.points : 0
-      };
-    });
+    const rows = data.teams.map(team => ({
+      name: `<span>${team.emoji} ${team.name}</span>`,
+      value: bonus.achieved[team.id] ? 'Erreicht' : 'Ausstehend',
+      pts: bonus.achieved[team.id] ? bonus.points : 0
+    }));
 
     return makeBonusCard(
       bonus.title,
@@ -937,7 +934,7 @@ function getTeamBonusDefinitions() {
       points: 10,
       description: 'Dieser Bonus wird vergeben, wenn das Team einen neuen Namen ausgewählt hat.',
       achieved: data.teams.reduce((acc, team) => {
-        acc[team.id] = Boolean(team.nameSelected);
+        acc[team.id] = Boolean(team.namechange);
         return acc;
       }, {})
     },
@@ -948,7 +945,7 @@ function getTeamBonusDefinitions() {
       points: 15,
       description: 'Dieser Bonus wird vergeben, wenn das Team ein eigenes Logo erstellt hat.',
       achieved: data.teams.reduce((acc, team) => {
-        acc[team.id] = Boolean(team.logoDesigned);
+        acc[team.id] = Boolean(team.logo);
         return acc;
       }, {})
     },
@@ -956,7 +953,7 @@ function getTeamBonusDefinitions() {
       id: 'team-photo',
       title: 'Gemeinsames Gruppenbild',
       icon: '📸',
-      points: 20,
+      points: 30,
       description: 'Dieser Bonus wird vergeben, wenn das Team ein gemeinsames Gruppenfoto gemacht hat.',
       achieved: data.teams.reduce((acc, team) => {
         acc[team.id] = Boolean(team.groupPhoto);
@@ -967,7 +964,7 @@ function getTeamBonusDefinitions() {
       id: 'team-coach-icecream',
       title: 'Trainer zum Eis eingeladen',
       icon: '🍦',
-      points: 10,
+      points: 15,
       description: 'Dieser Bonus wird vergeben, wenn das Team seinen Trainer zum Eis eingeladen hat.',
       achieved: data.teams.reduce((acc, team) => {
         acc[team.id] = Boolean(team.coachIceCream);

@@ -9,20 +9,25 @@
             "id": "team1",
             "name": "Wölfe",
             "color": "#dc3545",
-            "emoji": "🐺"
+            "emoji": "🐺",
+            "logo": false,
+            "namechange": false
         },
         {
             "id": "team2",
             "name": "Blue Wing Warriors",
             "color": "#007bff",
             "emoji": "🦅",
-            "logo": "BlueWingWarriors.jpeg"
+            "logo": "BlueWingWarriors.jpeg",
+            "namechange": true
         },
         {
             "id": "team3",
             "name": "Löwen",
             "color": "#28a745",
-            "emoji": "🦁"
+            "emoji": "🦁",
+            "logo": false,
+            "namechange": false
         }
     ],
     "players": [
