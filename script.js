@@ -1847,10 +1847,17 @@ function renderRunFeed() {
         </span>`;
       }
       
+      let styleStr = '';
+      if (cardClasses.includes('duo-run')) {
+        styleStr = `--color-1: ${color1}; --color-2: ${color2}`;
+      } else {
+        styleStr = `border-left-color: ${mainTeam.color}`;
+      }
+      
       const imageHtml = imageSrc ? `<div class="run-card-image"><img src="${imageSrc}" alt="${imageAlt}" /></div>` : '';
 
       return `
-        <div class="run-card ${cardClasses}" style="--color-1: ${color1}; --color-2: ${color2}">
+        <div class="run-card ${cardClasses}" style="${styleStr}">
           ${imageHtml}
           <div class="run-card-content">
             ${allTeams.length > 1 ? `
