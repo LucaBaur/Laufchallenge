@@ -132,7 +132,8 @@
             "id": "p17",
             "name": "Anni",
             "team": "team3",
-            "gender": "f"
+            "gender": "f",
+            "portrait": "p17.jpg"
         },
         {
             "id": "p18",
@@ -867,6 +868,153 @@
             "elevation": 0,
             "duration": 40.0,
             "partners": []
+        },
+        {
+            "id": "r036",
+            "player": "p11",
+            "date": "2026-05-12",
+            "startTime": "17:30",
+            "distance": 7.0,
+            "elevation": 0,
+            "duration": 42.266666666666666,
+            "partners": []
+        },
+        {
+            "id": "r037",
+            "player": "p9",
+            "date": "2026-05-12",
+            "startTime": "17:45",
+            "distance": 10.5,
+            "elevation": 57,
+            "duration": 67.66666666666667,
+            "partners": []
+        },
+        {
+            "id": "r038",
+            "player": "p1",
+            "date": "2026-05-12",
+            "startTime": "17:20",
+            "distance": 10.05,
+            "elevation": 0,
+            "duration": 55.31666666666667,
+            "partners": []
+        },
+        {
+            "id": "a036",
+            "player": "p16",
+            "date": "2026-05-10",
+            "startTime": "18:00",
+            "distance": 0.0,
+            "elevation": 0,
+            "duration": 80.0,
+            "partners": [],
+            "activity": "Krafttraining"
+        },
+        {
+            "id": "a037",
+            "player": "p16",
+            "date": "2026-05-11",
+            "startTime": "16:00",
+            "distance": 0.0,
+            "elevation": 0,
+            "duration": 25.0,
+            "partners": [],
+            "activity": "Pilates"
+        },
+        {
+            "id": "a038",
+            "player": "p16",
+            "date": "2026-05-12",
+            "startTime": "21:00",
+            "distance": 23.0,
+            "elevation": 0,
+            "duration": 60.56666666666667,
+            "partners": [],
+            "activity": "Radfahren"
+        },
+        {
+            "id": "r039",
+            "player": "p14",
+            "date": "2026-05-12",
+            "startTime": "16:00",
+            "distance": 10.15,
+            "elevation": 164,
+            "duration": 64.15,
+            "partners": []
+        },
+        {
+            "id": "r040",
+            "player": "p14",
+            "date": "2026-05-13",
+            "startTime": "09:30",
+            "distance": 7.0,
+            "elevation": 45,
+            "duration": 39.13333333333333,
+            "partners": []
+        },
+        {
+            "id": "a039",
+            "player": "p7",
+            "date": "2026-05-10",
+            "startTime": "18:00",
+            "distance": 6.0,
+            "elevation": 522,
+            "duration": 120.0,
+            "partners": [],
+            "activity": "Wandern"
+        },
+        {
+            "id": "r041",
+            "player": "p7",
+            "date": "2026-05-13",
+            "startTime": "12:00",
+            "distance": 6.25,
+            "elevation": 15,
+            "duration": 37.35,
+            "partners": []
+        },
+        {
+            "id": "a040",
+            "player": "p5",
+            "date": "2026-05-13",
+            "startTime": "10:00",
+            "distance": 0.0,
+            "elevation": 0,
+            "duration": 135.0,
+            "partners": [],
+            "activity": "Krafttraining"
+        },
+        {
+            "id": "r042",
+            "player": "p5",
+            "date": "2026-05-13",
+            "startTime": "13:00",
+            "distance": 10.1,
+            "elevation": 87,
+            "duration": 72.71666666666667,
+            "partners": []
+        },
+        {
+            "id": "a041",
+            "player": "p14",
+            "date": "2026-05-8",
+            "startTime": "12:00",
+            "distance": 0.0,
+            "elevation": 0,
+            "duration": 60.0,
+            "partners": [],
+            "activity": "Workout"
+        },
+        {
+            "id": "a042",
+            "player": "p14",
+            "date": "2026-05-7",
+            "startTime": "18:00",
+            "distance": 0.0,
+            "elevation": 0,
+            "duration": 50.0,
+            "partners": [],
+            "activity": "Yoga"
         }
     ]
 }
