@@ -7,11 +7,11 @@
     "teams": [
         {
             "id": "team1",
-            "name": "Wölfe",
+            "name": "Gegenstoß-Gazellen",
             "color": "#dc3545",
-            "emoji": "🐺",
-            "logo": false,
-            "namechange": false
+            "emoji": "🦌",
+            "logo": "Gegenstoß-Gazellen.jpeg",
+            "namechange": true
         },
         {
             "id": "team2",
@@ -1265,6 +1265,70 @@
             "distance": 8.0,
             "elevation": 0,
             "duration": 49.0,
+            "partners": []
+        },
+        {
+            "id": "r057",
+            "player": "p18",
+            "date": "2026-05-16",
+            "startTime": "17:00",
+            "distance": 4.0,
+            "elevation": 0,
+            "duration": 23.0,
+            "partners": []
+        },
+        {
+            "id": "a054",
+            "player": "p18",
+            "date": "2026-05-16",
+            "startTime": "17:30",
+            "distance": 0.0,
+            "elevation": 0,
+            "duration": 45.0,
+            "partners": [],
+            "activity": "Krafttraining"
+        },
+        {
+            "id": "a055",
+            "player": "p3",
+            "date": "2026-05-16",
+            "startTime": "17:00",
+            "distance": 0.0,
+            "elevation": 0,
+            "duration": 60.0,
+            "partners": [],
+            "activity": "Sonstiges"
+        },
+        {
+            "id": "a056",
+            "player": "p1",
+            "date": "2026-05-16",
+            "startTime": "16:00",
+            "distance": 0.0,
+            "elevation": 0,
+            "duration": 45.0,
+            "partners": [],
+            "activity": "Krafttraining"
+        },
+        {
+            "id": "a057",
+            "player": "p1",
+            "date": "2026-05-16",
+            "startTime": "16:00",
+            "distance": 65.0,
+            "elevation": 0,
+            "duration": 131.0,
+            "partners": [],
+            "activity": "Radfahren"
+        },
+        {
+            "id": "r058",
+            "player": "p9",
+            "date": "2026-05-14",
+            "startTime": "18:00",
+            "distance": 4.5,
+            "elevation": 16,
+            "duration": 27.783333333333335,
             "partners": []
         }
     ]
