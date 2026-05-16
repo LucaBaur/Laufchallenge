@@ -1214,6 +1214,16 @@
             "elevation": 0,
             "duration": 26.0,
             "partners": []
+        },
+        {
+            "id": "r054",
+            "player": "p8",
+            "date": "2026-05-8",
+            "startTime": "17:06",
+            "distance": 2.85,
+            "elevation": 0,
+            "duration": 22.0,
+            "partners": []
         }
     ]
 }
