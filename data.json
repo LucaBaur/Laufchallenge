@@ -1204,6 +1204,16 @@
             "duration": 76.0,
             "partners": [],
             "activity": "Radfahren"
+        },
+        {
+            "id": "r053",
+            "player": "p10",
+            "date": "2026-05-16",
+            "startTime": "12:00",
+            "distance": 4.2,
+            "elevation": 0,
+            "duration": 26.0,
+            "partners": []
         }
     ]
 }
