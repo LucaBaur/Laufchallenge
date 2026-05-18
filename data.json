@@ -23,11 +23,11 @@
         },
         {
             "id": "team3",
-            "name": "Löwen",
+            "name": "GTOWN Lions",
             "color": "#28a745",
             "emoji": "🦁",
-            "logo": false,
-            "namechange": false
+            "logo": "gtwon Lions.jpeg",
+            "namechange": true
         }
     ],
     "players": [
@@ -1330,6 +1330,244 @@
             "elevation": 16,
             "duration": 27.783333333333335,
             "partners": []
+        },
+        {
+            "id": "a058",
+            "player": "p18",
+            "date": "2026-05-17",
+            "startTime": "08:00",
+            "distance": 0.0,
+            "elevation": 0,
+            "duration": 35.0,
+            "partners": [],
+            "activity": "Yoga"
+        },
+        {
+            "id": "a059",
+            "player": "p18",
+            "date": "2026-05-18",
+            "startTime": "16:00",
+            "distance": 0.0,
+            "elevation": 0,
+            "duration": 70.0,
+            "partners": [],
+            "activity": "Krafttraining"
+        },
+        {
+            "id": "r059",
+            "player": "p13",
+            "date": "2026-05-18",
+            "startTime": "17:00",
+            "distance": 5.24,
+            "elevation": 64,
+            "duration": 70.0,
+            "partners": []
+        },
+        {
+            "id": "a060",
+            "player": "p14",
+            "date": "2026-05-17",
+            "startTime": "12:00",
+            "distance": 0.0,
+            "elevation": 0,
+            "duration": 45.0,
+            "partners": [],
+            "activity": "Krafttraining"
+        },
+        {
+            "id": "a061",
+            "player": "p14",
+            "date": "2026-05-17",
+            "startTime": "15:00",
+            "distance": 0.0,
+            "elevation": 0,
+            "duration": 30.0,
+            "partners": [],
+            "activity": "Yoga"
+        },
+        {
+            "id": "r060",
+            "player": "p9",
+            "date": "2026-05-16",
+            "startTime": "19:00",
+            "distance": 8.17,
+            "elevation": 24,
+            "duration": 45.0,
+            "partners": []
+        },
+        {
+            "id": "r061",
+            "player": "p9",
+            "date": "2026-05-17",
+            "startTime": "17:30",
+            "distance": 10.53,
+            "elevation": 0,
+            "duration": 63.0,
+            "partners": [
+                "p4"
+            ]
+        },
+        {
+            "id": "r062",
+            "player": "p15",
+            "date": "2026-05-17",
+            "startTime": "18:00",
+            "distance": 1.82,
+            "elevation": 20,
+            "duration": 14.433333333333334,
+            "partners": []
+        },
+        {
+            "id": "a062",
+            "player": "p15",
+            "date": "2026-05-17",
+            "startTime": "18:15",
+            "distance": 8.2,
+            "elevation": 93,
+            "duration": 39.0,
+            "partners": [],
+            "activity": "Radfahren"
+        },
+        {
+            "id": "a063",
+            "player": "p15",
+            "date": "2026-05-16",
+            "startTime": "18:00",
+            "distance": 8.17,
+            "elevation": 97,
+            "duration": 36.0,
+            "partners": [],
+            "activity": "Radfahren"
+        },
+        {
+            "id": "a064",
+            "player": "p4",
+            "date": "2026-05-12",
+            "startTime": "18:00",
+            "distance": 0.0,
+            "elevation": 0,
+            "duration": 120.0,
+            "partners": [],
+            "activity": "Sonstiges"
+        },
+        {
+            "id": "a065",
+            "player": "p4",
+            "date": "2026-05-15",
+            "startTime": "16:00",
+            "distance": 0.0,
+            "elevation": 0,
+            "duration": 60.0,
+            "partners": [],
+            "activity": "Sonstiges"
+        },
+        {
+            "id": "a066",
+            "player": "p4",
+            "date": "2026-05-17",
+            "startTime": "12:00",
+            "distance": 0.0,
+            "elevation": 0,
+            "duration": 120.0,
+            "partners": [],
+            "activity": "Wandern"
+        },
+        {
+            "id": "a067",
+            "player": "p4",
+            "date": "2026-05-17",
+            "startTime": "16:00",
+            "distance": 0.0,
+            "elevation": 0,
+            "duration": 120.0,
+            "partners": [],
+            "activity": "Krafttraining"
+        },
+        {
+            "id": "a068",
+            "player": "p1",
+            "date": "2026-05-17",
+            "startTime": "12:00",
+            "distance": 3.0,
+            "elevation": 0,
+            "duration": 53.0,
+            "partners": [],
+            "activity": "Schwimmen"
+        },
+        {
+            "id": "r063",
+            "player": "p1",
+            "date": "2026-05-17",
+            "startTime": "14:00",
+            "distance": 18.6,
+            "elevation": 0,
+            "duration": 93.0,
+            "partners": []
+        },
+        {
+            "id": "a069",
+            "player": "p2",
+            "date": "2026-05-17",
+            "startTime": "13:00",
+            "distance": 27.8,
+            "elevation": 0,
+            "duration": 89.0,
+            "partners": [],
+            "activity": "Radfahren"
+        },
+        {
+            "id": "r064",
+            "player": "p2",
+            "date": "2026-05-17",
+            "startTime": "16:00",
+            "distance": 4.78,
+            "elevation": 75,
+            "duration": 30.0,
+            "partners": []
+        },
+        {
+            "id": "a070",
+            "player": "p2",
+            "date": "2026-05-10",
+            "startTime": "10:00",
+            "distance": 4.6,
+            "elevation": 0,
+            "duration": 194.0,
+            "partners": [],
+            "activity": "Wandern"
+        },
+        {
+            "id": "a071",
+            "player": "p16",
+            "date": "2026-05-16",
+            "startTime": "15:00",
+            "distance": 0.0,
+            "elevation": 0,
+            "duration": 90.0,
+            "partners": [],
+            "activity": "Krafttraining"
+        },
+        {
+            "id": "a072",
+            "player": "p16",
+            "date": "2026-05-15",
+            "startTime": "16:00",
+            "distance": 0.0,
+            "elevation": 0,
+            "duration": 90.0,
+            "partners": [],
+            "activity": "Krafttraining"
+        },
+        {
+            "id": "a073",
+            "player": "p14",
+            "date": "2026-05-18",
+            "startTime": "12:00",
+            "distance": 12.5,
+            "elevation": 0,
+            "duration": 45.0,
+            "partners": [],
+            "activity": "Radfahren"
         }
     ]
 }
