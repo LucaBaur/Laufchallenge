@@ -773,7 +773,7 @@
         {
             "id": "a029",
             "player": "p13",
-            "date": "2026-05-5",
+            "date": "2026-05-05",
             "startTime": "17:00",
             "distance": 0.0,
             "elevation": 0,
@@ -997,7 +997,7 @@
         {
             "id": "a041",
             "player": "p14",
-            "date": "2026-05-8",
+            "date": "2026-05-08",
             "startTime": "12:00",
             "distance": 0.0,
             "elevation": 0,
@@ -1008,7 +1008,7 @@
         {
             "id": "a042",
             "player": "p14",
-            "date": "2026-05-7",
+            "date": "2026-05-07",
             "startTime": "18:00",
             "distance": 0.0,
             "elevation": 0,
@@ -1218,7 +1218,7 @@
         {
             "id": "r054",
             "player": "p8",
-            "date": "2026-05-8",
+            "date": "2026-05-08",
             "startTime": "17:06",
             "distance": 2.85,
             "elevation": 0,

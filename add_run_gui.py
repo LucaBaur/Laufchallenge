@@ -169,6 +169,28 @@ class RunAdderGUI:
         with open(DATA_FILE, 'w', encoding='utf-8') as f:
             json.dump(self.data, f, indent=4, ensure_ascii=False)
     
+    def normalize_date(self, date_str):
+        """Normalisiert Datumsstring zu ISO-Format YYYY-MM-DD mit führenden Nullen"""
+        date_str = str(date_str).strip()
+        try:
+            # Versuche zu parsen und wieder zu formatieren
+            dt = datetime.strptime(date_str, '%Y-%m-%d')
+            return dt.strftime('%Y-%m-%d')
+        except ValueError:
+            # Falls fehlerhafte Eingabe, versuche alternative Formate
+            try:
+                # Versuche mit Bindestrichen zu parsen, egal ob führende Nullen fehlen
+                parts = date_str.split('-')
+                if len(parts) == 3:
+                    year = int(parts[0])
+                    month = int(parts[1])
+                    day = int(parts[2])
+                    dt = datetime(year, month, day)
+                    return dt.strftime('%Y-%m-%d')
+            except (ValueError, IndexError):
+                pass
+            return None
+
     def parse_time(self, time_str):
         """Konvertiert Zeit zu Minuten"""
         time_str = str(time_str).strip()
@@ -209,10 +231,11 @@ class RunAdderGUI:
             # -1 = gestern
             date_str = (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')
         else:
-            # Gültiges Datum validieren
-            try:
-                datetime.strptime(date_str, '%Y-%m-%d')
-            except ValueError:
+            # Versuche zu normalisieren
+            normalized = self.normalize_date(date_str)
+            if normalized:
+                date_str = normalized
+            else:
                 messagebox.showerror("Fehler", "Ungültiges Datumsformat (YYYY-MM-DD, oder leer für heute, oder -1 für gestern)")
                 return
         

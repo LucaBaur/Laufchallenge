@@ -190,9 +190,20 @@ function parseDateTime(value) {
   if (typeof value !== 'string' || !value.trim()) return null;
 
   let normalized = value.trim();
+  const dateTimeParts = normalized.split('T');
+  const dateParts = dateTimeParts[0].split('-').map(part => part.padStart(2, '0'));
+
+  if (dateParts.length === 3) {
+    normalized = `${dateParts[0]}-${dateParts[1]}-${dateParts[2]}`;
+    if (dateTimeParts[1]) {
+      const timeParts = dateTimeParts[1].split(':').map((part, idx) => idx === 0 ? part.padStart(2, '0') : part);
+      normalized += `T${timeParts.join(':')}`;
+    }
+  }
+
   if (/^\d{4}-\d{2}-\d{2}$/.test(normalized)) {
     normalized += 'T00:00:00';
-  } else if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(normalized)) {
+  } else if (/^\d{4}-\d{2}-\d{2}T\d{1,2}:\d{2}$/.test(normalized)) {
     normalized += ':00';
   }
 
@@ -1728,8 +1739,8 @@ function renderRunFeed() {
 
   // Sort activities by date descending (newest first)
   const sortedActivities = allActivities.slice().sort((a, b) => {
-    const dateA = new Date(`${a.date}T${a.startTime || '00:00'}:00`);
-    const dateB = new Date(`${b.date}T${b.startTime || '00:00'}:00`);
+    const dateA = parseDateTime(`${a.date}T${a.startTime || '00:00'}`);
+    const dateB = parseDateTime(`${b.date}T${b.startTime || '00:00'}`);
     return dateB - dateA;
   });
 
