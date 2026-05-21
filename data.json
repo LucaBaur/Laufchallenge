@@ -1663,6 +1663,27 @@
             "elevation": 18,
             "duration": 35.0,
             "partners": []
+        },
+        {
+            "id": "a080",
+            "player": "p7",
+            "date": "2026-05-16",
+            "startTime": "17:00",
+            "distance": 0.0,
+            "elevation": 0,
+            "duration": 120.0,
+            "partners": [],
+            "activity": "Krafttraining"
+        },
+        {
+            "id": "r070",
+            "player": "p7",
+            "date": "2026-05-18",
+            "startTime": "7:00",
+            "distance": 12.6,
+            "elevation": 134,
+            "duration": 76.0,
+            "partners": []
         }
     ]
 }
