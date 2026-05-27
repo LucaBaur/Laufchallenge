@@ -1900,3 +1900,231 @@ function renderRunFeed() {
     }).join('');
   }
 }
+
+// ─────────────────────────────────────────────
+//  PLAYER PROFILE MODAL
+// ─────────────────────────────────────────────
+
+function openPlayerProfile(playerId) {
+  const player = getPlayer(playerId);
+  const team   = getTeam(player.team);
+  const pStats = computePlayerStats();
+  const stats  = pStats[playerId];
+
+  if (!stats) return;
+
+  // Rank among all players by distance
+  const allSorted = Object.values(pStats).sort((a, b) => b.distance - a.distance);
+  const rankIdx   = allSorted.findIndex(p => p.id === playerId);
+  const rank      = rankIdx + 1;
+
+  // Populate header
+  const avatarEl = document.getElementById('profileAvatar');
+  if (player.portrait) {
+    avatarEl.outerHTML = `<img class="profile-avatar" id="profileAvatar" src="${player.portrait}" alt="${player.name}" />`;
+  } else {
+    const initials = player.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+    avatarEl.textContent  = initials;
+    avatarEl.style.background = team.color;
+  }
+
+  document.getElementById('profileName').textContent = player.name;
+  const badge = document.getElementById('profileTeamBadge');
+  badge.textContent = `${team.emoji} ${team.name}`;
+  badge.style.background = team.color;
+
+  // Rank row medal
+  const rankMedal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
+
+  // Best pace (min/km) from running activities
+  const playerRuns = (data.runs || []).filter(r => r.player === playerId && isRunningActivity(r) && r.distance > 0 && r.duration > 0);
+  let bestPace = null;
+  playerRuns.forEach(r => {
+    const pace = r.duration / r.distance; // min per km
+    if (bestPace === null || pace < bestPace) bestPace = pace;
+  });
+  const paceStr = bestPace
+    ? `${Math.floor(bestPace)}:${String(Math.round((bestPace % 1) * 60)).padStart(2, '0')} /km`
+    : '--';
+
+  // Weekly distance chart (last 4 weeks)
+  const weekMap = {};
+  playerRuns.forEach(r => {
+    const wk = weekKey(r.date);
+    weekMap[wk] = (weekMap[wk] || 0) + r.distance;
+  });
+  const weekKeys = Object.keys(weekMap).sort().slice(-4);
+  const maxWkDist = Math.max(...weekKeys.map(k => weekMap[k]), 1);
+
+  const weekChartHTML = weekKeys.length > 0 ? `
+    <div class="profile-mini-chart">
+      <div class="profile-section-title">📅 Wochenkilometer (letzte Wochen)</div>
+      ${weekKeys.map(wk => {
+        const val = Math.round(weekMap[wk] * 10) / 10;
+        const pct = (val / maxWkDist * 100).toFixed(1);
+        return `
+          <div class="profile-chart-bar-wrap">
+            <div class="profile-chart-label">${wk.replace(/\d{4}-/, '')}</div>
+            <div class="profile-chart-bar-bg">
+              <div class="profile-chart-bar-fill" style="width:${pct}%; background:${team.color}"></div>
+            </div>
+            <div class="profile-chart-val">${val} km</div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  ` : '';
+
+  // Recent activities (last 5)
+  const allActivities = (data.runs || [])
+    .filter(r => r.player === playerId)
+    .sort((a, b) => {
+      const dA = new Date(`${a.date}T${a.startTime || '00:00'}`);
+      const dB = new Date(`${b.date}T${b.startTime || '00:00'}`);
+      return dB - dA;
+    })
+    .slice(0, 5);
+
+  const activityIcon = (act) => {
+    const a = (act || '').toLowerCase();
+    if (!a || a.includes('lauf') || a.includes('run') || a.includes('jog')) return '🏃';
+    if (a.includes('rad') || a.includes('bike') || a.includes('cycl')) return '🚴';
+    if (a.includes('yoga'))    return '🧘';
+    if (a.includes('kraft') || a.includes('gym')) return '💪';
+    if (a.includes('schwimm') || a.includes('swim')) return '🏊';
+    if (a.includes('wander') || a.includes('hike')) return '🥾';
+    return '⚡';
+  };
+
+  const recentHTML = allActivities.length > 0
+    ? allActivities.map(r => {
+        const isRun = isRunningActivity(r);
+        const icon  = activityIcon(r.activity);
+        const label = isRun ? `${r.distance} km Lauf` : (r.activity || 'Aktivität');
+        const dur   = r.duration ? `${Math.round(r.duration)} min` : '';
+        const distStr = r.distance > 0 ? `${r.distance} km` : dur;
+        return `
+          <div class="profile-run-item">
+            <div class="profile-run-emoji">${icon}</div>
+            <div class="profile-run-info">
+              <div class="profile-run-title">${label}</div>
+              <div class="profile-run-sub">${fmtDate(r.date)} ${r.startTime ? '· ' + r.startTime : ''}${dur ? ' · ' + dur : ''}</div>
+            </div>
+            <div class="profile-run-dist">${distStr}</div>
+          </div>
+        `;
+      }).join('')
+    : `<div class="profile-empty">Noch keine Aktivitäten 🏃</div>`;
+
+  // Populate body
+  document.getElementById('profileBody').innerHTML = `
+    <div class="profile-rank-row">
+      <div class="profile-rank-num">${rankMedal}</div>
+      <div>
+        <div style="font-weight:700; font-size:0.9rem;">Platz ${rank} Gesamt</div>
+        <div class="profile-rank-label">Spieler-Rangliste (Kilometer)</div>
+      </div>
+    </div>
+
+    <div class="profile-stats-grid">
+      <div class="profile-stat-card">
+        <div class="profile-stat-icon">📏</div>
+        <div class="profile-stat-value">${stats.distance} km</div>
+        <div class="profile-stat-label">Gesamt km</div>
+      </div>
+      <div class="profile-stat-card">
+        <div class="profile-stat-icon">🔢</div>
+        <div class="profile-stat-value">${stats.runs}</div>
+        <div class="profile-stat-label">Läufe</div>
+      </div>
+      <div class="profile-stat-card">
+        <div class="profile-stat-icon">⛰️</div>
+        <div class="profile-stat-value">${stats.elevation.toLocaleString('de-DE')} m</div>
+        <div class="profile-stat-label">Höhenmeter</div>
+      </div>
+      <div class="profile-stat-card">
+        <div class="profile-stat-icon">🏆</div>
+        <div class="profile-stat-value">${stats.longestDist.toFixed(1)} km</div>
+        <div class="profile-stat-label">Längster Lauf</div>
+      </div>
+      <div class="profile-stat-card">
+        <div class="profile-stat-icon">⏱️</div>
+        <div class="profile-stat-value">${Math.round(stats.longestTime)} min</div>
+        <div class="profile-stat-label">Längster Zeit</div>
+      </div>
+      <div class="profile-stat-card">
+        <div class="profile-stat-icon">⚡</div>
+        <div class="profile-stat-value">${paceStr}</div>
+        <div class="profile-stat-label">Beste Pace</div>
+      </div>
+    </div>
+
+    ${weekChartHTML}
+
+    <div class="profile-mini-chart" style="margin-top:16px;">
+      <div class="profile-section-title">🕒 Letzte Aktivitäten</div>
+      <div class="profile-recent-runs">${recentHTML}</div>
+    </div>
+  `;
+
+  document.getElementById('profileOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePlayerProfile() {
+  document.getElementById('profileOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function setupProfileModal() {
+  const overlay = document.getElementById('profileOverlay');
+  const closeBtn = document.getElementById('profileClose');
+
+  if (!overlay || !closeBtn) return;
+
+  closeBtn.addEventListener('click', closePlayerProfile);
+
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) closePlayerProfile();
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closePlayerProfile();
+  });
+}
+
+// Attach click handlers to player table rows (called after table renders)
+function attachPlayerRowClicks() {
+  document.querySelectorAll('#playerTableBody tr').forEach(row => {
+    row.addEventListener('click', () => {
+      const nameCell = row.querySelector('td:nth-child(2) strong');
+      if (!nameCell) return;
+      const name = nameCell.textContent.trim();
+      const player = data.players.find(p => p.name === name);
+      if (player) openPlayerProfile(player.id);
+    });
+  });
+}
+
+// Patch renderPlayerLeaderboard to wire up clicks after table render
+// We do this by observing the tbody for DOM changes (safe, no recursion)
+function setupPlayerTableClickObserver() {
+  const tbody = document.getElementById('playerTableBody');
+  if (!tbody) return;
+  const observer = new MutationObserver(() => attachPlayerRowClicks());
+  observer.observe(tbody, { childList: true });
+}
+
+// Called once data is ready – extend initApp via DOMContentLoaded sequence
+document.addEventListener('DOMContentLoaded', () => {
+  setupProfileModal();
+  // Wait for data load then observe
+  const checkReady = setInterval(() => {
+    if (document.getElementById('playerTableBody') && data) {
+      setupPlayerTableClickObserver();
+      attachPlayerRowClicks();
+      clearInterval(checkReady);
+    }
+  }, 200);
+});
+
