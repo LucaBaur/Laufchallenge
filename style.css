@@ -1926,3 +1926,37 @@ a:hover { text-decoration: underline; }
   }
 }
 
+
+/* ── Profile: activity type tag & other-activity summary ─────── */
+.profile-activity-tag {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-size: 0.62rem;
+  font-weight: 600;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  vertical-align: middle;
+}
+
+.profile-other-summary {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+  padding: 6px 10px;
+  background: var(--surface2);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  line-height: 1.6;
+}
+
+/* Week chart: wider value column so km + activity badge fit */
+.profile-chart-val {
+  width: 80px !important;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2px;
+}

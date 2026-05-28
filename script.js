@@ -1918,13 +1918,26 @@ function openPlayerProfile(playerId) {
   const rankIdx   = allSorted.findIndex(p => p.id === playerId);
   const rank      = rankIdx + 1;
 
-  // Populate header
+  // Populate header — reset avatar element first to avoid stale outerHTML swap issues
+  const headerEl = document.getElementById('profileHeader');
+  let oldAvatar = document.getElementById('profileAvatar');
+  if (oldAvatar && oldAvatar.tagName === 'IMG') {
+    const placeholder = document.createElement('div');
+    placeholder.className = 'profile-avatar-placeholder';
+    placeholder.id = 'profileAvatar';
+    oldAvatar.replaceWith(placeholder);
+  }
   const avatarEl = document.getElementById('profileAvatar');
   if (player.portrait) {
-    avatarEl.outerHTML = `<img class="profile-avatar" id="profileAvatar" src="${player.portrait}" alt="${player.name}" />`;
+    const img = document.createElement('img');
+    img.className = 'profile-avatar';
+    img.id = 'profileAvatar';
+    img.src = player.portrait;
+    img.alt = player.name;
+    avatarEl.replaceWith(img);
   } else {
     const initials = player.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
-    avatarEl.textContent  = initials;
+    avatarEl.textContent = initials;
     avatarEl.style.background = team.color;
   }
 
@@ -1936,79 +1949,132 @@ function openPlayerProfile(playerId) {
   // Rank row medal
   const rankMedal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
 
-  // Best pace (min/km) from running activities
-  const playerRuns = (data.runs || []).filter(r => r.player === playerId && isRunningActivity(r) && r.distance > 0 && r.duration > 0);
+  // Helper: activity icon
+  const activityIcon = (act) => {
+    const a = (act || '').toLowerCase();
+    if (!a || a.includes('lauf') || a.includes('run') || a.includes('jog')) return '🏃';
+    if (a.includes('rad') || a.includes('bike') || a.includes('cycl')) return '🚴';
+    if (a.includes('yoga'))    return '🧘';
+    if (a.includes('kraft') || a.includes('gym') || a.includes('fitness')) return '💪';
+    if (a.includes('schwimm') || a.includes('swim')) return '🏊';
+    if (a.includes('wander') || a.includes('hike')) return '🥾';
+    if (a.includes('sonst')) return '⚡';
+    return '⚡';
+  };
+
+  // Helper: activity label
+  const activityLabel = (r) => {
+    if (isRunningActivity(r)) return `${r.distance > 0 ? r.distance + ' km ' : ''}Lauf`;
+    return r.activity || 'Aktivität';
+  };
+
+  // Best pace (min/km) from running activities only
+  const playerRuns = (data.runs || []).filter(r =>
+    r.player === playerId && isRunningActivity(r) && r.distance > 0 && r.duration > 0
+  );
   let bestPace = null;
   playerRuns.forEach(r => {
-    const pace = r.duration / r.distance; // min per km
+    const pace = r.duration / r.distance;
     if (bestPace === null || pace < bestPace) bestPace = pace;
   });
   const paceStr = bestPace
     ? `${Math.floor(bestPace)}:${String(Math.round((bestPace % 1) * 60)).padStart(2, '0')} /km`
     : '--';
 
-  // Weekly distance chart (last 4 weeks)
-  const weekMap = {};
+  // ── WEEK CHART: all challenge weeks, 0 km if no runs that week ──
+  // Build run-km per week map (only running activities count for km chart)
+  const runWeekMap = {};
   playerRuns.forEach(r => {
     const wk = weekKey(r.date);
-    weekMap[wk] = (weekMap[wk] || 0) + r.distance;
+    runWeekMap[wk] = (runWeekMap[wk] || 0) + r.distance;
   });
-  const weekKeys = Object.keys(weekMap).sort().slice(-4);
-  const maxWkDist = Math.max(...weekKeys.map(k => weekMap[k]), 1);
 
-  const weekChartHTML = weekKeys.length > 0 ? `
+  // Build other-activity count per week (all non-running activities)
+  const otherWeekMap = {};
+  (data.runs || []).filter(r => r.player === playerId && isOtherSportActivity(r)).forEach(r => {
+    const wk = weekKey(r.date);
+    otherWeekMap[wk] = (otherWeekMap[wk] || 0) + 1;
+  });
+
+  // All challenge weeks (guaranteed complete list, even weeks with 0 activity)
+  const allChallengeWeeks = getChallengeWeekKeys();
+  const maxWkDist = Math.max(...allChallengeWeeks.map(k => runWeekMap[k] || 0), 1);
+
+  // Human-readable week label: "KW 19 (05.05–11.05)"
+  const weekLabel = (wkKey) => {
+    // wkKey = "2026-W19"
+    const [year, wPart] = wkKey.split('-W');
+    const wNum = parseInt(wPart, 10);
+    // Get Monday of that ISO week
+    const jan4 = new Date(Date.UTC(parseInt(year, 10), 0, 4));
+    const dayOfWeek = jan4.getUTCDay() || 7;
+    const monday = new Date(jan4);
+    monday.setUTCDate(jan4.getUTCDate() - dayOfWeek + 1 + (wNum - 1) * 7);
+    const sunday = new Date(monday);
+    sunday.setUTCDate(monday.getUTCDate() + 6);
+    const fmt = (d) => `${String(d.getUTCDate()).padStart(2,'0')}.${String(d.getUTCMonth()+1).padStart(2,'0')}`;
+    return `KW ${wNum} (${fmt(monday)}–${fmt(sunday)})`;
+  };
+
+  const weekChartHTML = `
     <div class="profile-mini-chart">
-      <div class="profile-section-title">📅 Wochenkilometer (letzte Wochen)</div>
-      ${weekKeys.map(wk => {
-        const val = Math.round(weekMap[wk] * 10) / 10;
-        const pct = (val / maxWkDist * 100).toFixed(1);
+      <div class="profile-section-title">📅 Wochenübersicht</div>
+      ${allChallengeWeeks.map(wk => {
+        const kmVal  = Math.round((runWeekMap[wk] || 0) * 10) / 10;
+        const others = otherWeekMap[wk] || 0;
+        const pct    = (kmVal / maxWkDist * 100).toFixed(1);
+        const isEmpty = kmVal === 0 && others === 0;
         return `
-          <div class="profile-chart-bar-wrap">
-            <div class="profile-chart-label">${wk.replace(/\d{4}-/, '')}</div>
+          <div class="profile-chart-bar-wrap" style="${isEmpty ? 'opacity:0.45' : ''}">
+            <div class="profile-chart-label" title="${weekLabel(wk)}">${wk.replace(/\d{4}-/, '')}</div>
             <div class="profile-chart-bar-bg">
-              <div class="profile-chart-bar-fill" style="width:${pct}%; background:${team.color}"></div>
+              <div class="profile-chart-bar-fill" style="width:${pct}%; background:${team.color}${kmVal === 0 ? '; opacity:0' : ''}"></div>
             </div>
-            <div class="profile-chart-val">${val} km</div>
+            <div class="profile-chart-val">
+              ${kmVal > 0 ? `<span style="color:var(--accent2)">${kmVal} km</span>` : '<span style="color:var(--text-muted)">– km</span>'}
+              ${others > 0 ? `<span style="margin-left:4px;font-size:0.65rem;color:var(--text-muted)" title="${others} andere Aktivität(en)">+${others}⚡</span>` : ''}
+            </div>
           </div>
         `;
       }).join('')}
     </div>
-  ` : '';
+  `;
 
-  // Recent activities (last 5)
+  // ── ALL ACTIVITIES (runs + other), sorted newest first ──
   const allActivities = (data.runs || [])
     .filter(r => r.player === playerId)
     .sort((a, b) => {
       const dA = new Date(`${a.date}T${a.startTime || '00:00'}`);
       const dB = new Date(`${b.date}T${b.startTime || '00:00'}`);
       return dB - dA;
-    })
-    .slice(0, 5);
+    });
 
-  const activityIcon = (act) => {
-    const a = (act || '').toLowerCase();
-    if (!a || a.includes('lauf') || a.includes('run') || a.includes('jog')) return '🏃';
-    if (a.includes('rad') || a.includes('bike') || a.includes('cycl')) return '🚴';
-    if (a.includes('yoga'))    return '🧘';
-    if (a.includes('kraft') || a.includes('gym')) return '💪';
-    if (a.includes('schwimm') || a.includes('swim')) return '🏊';
-    if (a.includes('wander') || a.includes('hike')) return '🥾';
-    return '⚡';
-  };
+  // Group by activity type for the "andere Aktivitäten" summary stat
+  const otherTypes = {};
+  allActivities.filter(r => isOtherSportActivity(r)).forEach(r => {
+    const key = r.activity || 'Sonstiges';
+    otherTypes[key] = (otherTypes[key] || 0) + 1;
+  });
+  const otherSummary = Object.entries(otherTypes)
+    .map(([t, n]) => `${activityIcon(t)} ${t} ×${n}`)
+    .join('  ·  ');
 
   const recentHTML = allActivities.length > 0
     ? allActivities.map(r => {
         const isRun = isRunningActivity(r);
         const icon  = activityIcon(r.activity);
-        const label = isRun ? `${r.distance} km Lauf` : (r.activity || 'Aktivität');
+        const label = activityLabel(r);
         const dur   = r.duration ? `${Math.round(r.duration)} min` : '';
-        const distStr = r.distance > 0 ? `${r.distance} km` : dur;
+        const distStr = r.distance > 0 ? `${r.distance} km` : (dur || '–');
+        const typeTag = !isRun
+          ? `<span class="profile-activity-tag">${r.activity || 'Sonstiges'}</span>`
+          : '';
         return `
           <div class="profile-run-item">
             <div class="profile-run-emoji">${icon}</div>
             <div class="profile-run-info">
-              <div class="profile-run-title">${label}</div>
-              <div class="profile-run-sub">${fmtDate(r.date)} ${r.startTime ? '· ' + r.startTime : ''}${dur ? ' · ' + dur : ''}</div>
+              <div class="profile-run-title">${label}${typeTag}</div>
+              <div class="profile-run-sub">${fmtDate(r.date)}${r.startTime ? ' · ' + r.startTime : ''}${dur ? ' · ' + dur : ''}</div>
             </div>
             <div class="profile-run-dist">${distStr}</div>
           </div>
@@ -2050,7 +2116,7 @@ function openPlayerProfile(playerId) {
       <div class="profile-stat-card">
         <div class="profile-stat-icon">⏱️</div>
         <div class="profile-stat-value">${Math.round(stats.longestTime)} min</div>
-        <div class="profile-stat-label">Längster Zeit</div>
+        <div class="profile-stat-label">Längste Zeit</div>
       </div>
       <div class="profile-stat-card">
         <div class="profile-stat-icon">⚡</div>
@@ -2062,7 +2128,8 @@ function openPlayerProfile(playerId) {
     ${weekChartHTML}
 
     <div class="profile-mini-chart" style="margin-top:16px;">
-      <div class="profile-section-title">🕒 Letzte Aktivitäten</div>
+      <div class="profile-section-title">🕒 Alle Aktivitäten (${allActivities.length})</div>
+      ${otherSummary ? `<div class="profile-other-summary">${otherSummary}</div>` : ''}
       <div class="profile-recent-runs">${recentHTML}</div>
     </div>
   `;
