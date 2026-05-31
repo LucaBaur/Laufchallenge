@@ -975,7 +975,7 @@ function getTeamBonusDefinitions() {
       id: 'team-coach-icecream',
       title: 'Trainer zum Eis eingeladen',
       icon: '🍦',
-      points: 15,
+      points: 20,
       description: 'Dieser Bonus wird vergeben, wenn das Team seinen Trainer zum Eis eingeladen hat.',
       achieved: data.teams.reduce((acc, team) => {
         acc[team.id] = Boolean(team.coachIceCream);

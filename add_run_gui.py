@@ -138,7 +138,7 @@ class RunAdderGUI:
         ttk.Label(main_frame, text="Aktivitätstyp (optional)", font=('Arial', 10, 'bold')).pack(anchor='w')
         self.activity_combo = ttk.Combobox(
             main_frame,
-            values=['Lauf', 'Radfahren', 'Schwimmen', 'Wandern', 'Yoga', 'Pilates', 'Krafttraining', 'Workout', 'Sonstiges'],
+            values=['Lauf', 'Radfahren', 'Schwimmen', 'Wandern', 'Yoga', 'Pilates', 'Krafttraining', 'Workout', 'Sonstiges', 'IRONMAN'],
             width=40,
             state='readonly'
         )
