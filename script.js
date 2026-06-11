@@ -967,7 +967,7 @@ function getTeamBonusDefinitions() {
       points: 30,
       description: 'Dieser Bonus wird vergeben, wenn das Team ein gemeinsames Gruppenfoto gemacht hat.',
       achieved: data.teams.reduce((acc, team) => {
-        acc[team.id] = Boolean(team.groupPhoto);
+        acc[team.id] = Boolean(team.groupPicturetaken);
         return acc;
       }, {})
     },
