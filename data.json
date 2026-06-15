@@ -12,7 +12,7 @@
             "emoji": "🦌",
             "logo": "Gegenstoß-Gazellen.jpeg",
             "namechange": true,
-            "coachIceCream": false,
+            "coachIceCream": true,
             "groupPicturetaken": true
         },
         {
@@ -23,7 +23,7 @@
             "logo": "BlueWingWarriors.jpeg",
             "namechange": true,
             "coachIceCream": true,
-            "groupPicturetaken": false
+            "groupPicturetaken": true
         },
         {
             "id": "team3",
@@ -33,7 +33,7 @@
             "logo": "gtwon Lions.jpeg",
             "namechange": true,
             "coachIceCream": true,
-            "groupPicturetaken": false
+            "groupPicturetaken": true
         }
     ],
     "players": [
