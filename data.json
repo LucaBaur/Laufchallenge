@@ -3957,6 +3957,26 @@
             "elevation": 0,
             "duration": 23.0,
             "partners": []
+        },
+        {
+            "id": "r176",
+            "player": "p7",
+            "date": "2026-06-11",
+            "startTime": "20:10",
+            "distance": 7.25,
+            "elevation": 12,
+            "duration": 40.0,
+            "partners": []
+        },
+        {
+            "id": "r177",
+            "player": "p7",
+            "date": "2026-06-12",
+            "startTime": "20:10",
+            "distance": 12.6,
+            "elevation": 108,
+            "duration": 79.0,
+            "partners": []
         }
     ]
 }
