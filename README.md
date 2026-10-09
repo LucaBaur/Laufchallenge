@@ -16,6 +16,14 @@ Es gibt keine Datenbank und kein Backend. Die komplette Website wird aus
 Helfern `add_run.py` / `add_run_gui.py`). Das hält den Betrieb kostenlos und
 macht die Daten jederzeit einsehbar.
 
+## Screenshots
+
+Der Demo-Modus mit erfundenen Namen (`demo.json`).
+
+| Team-Rangliste | Endstand |
+|---|---|
+| ![Team-Rangliste](docs/screenshot-teams.png) | ![Endstand](docs/screenshot-endstand.png) |
+
 ## Aufbau
 
 | Datei | Zweck |
